@@ -1,0 +1,48 @@
+# Build configuration file for Circle CI
+# needs to be named `circle.yml` and should be in the top level dir of the repo
+machine:
+  environment:
+    ANDROID_NDK_HOME: $ANDROID_NDK
+    # set the adb install timeout to 8 minutes (default is 2 minutes)
+    ADB_INSTALL_TIMEOUT: 8
+    JAVA_OPTS: "-Xms384m -Xmx640m"
+    # Gradle needs to have different options set.
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
+  java:
+    version: oraclejdk8
+
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter tools,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
+    - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3
+  cache_directories:
+    - "~/.gradle/caches/"
+    - "~/.gradle/wrapper/dists/"
+    - "~/.cache/lint"
+
+test:
+  pre:
+    - emulator -avd circleci-android22 -no-audio -no-window:
+        background: true
+        parallel: true
+    - circle-android wait-for-boot
+    - adb shell input keyevent 82
+    # Install our ci-support stuff to make the emulator tests more reliable.
+    - wget 'https://github.com/connectbot/ci-support/archive/master.zip'
+    - unzip master.zip
+    - rm master.zip
+    - adb install -r ci-support-master/apk/android_emulator_hacks.apk
+    - adb shell pm grant no.finn.android_emulator_hacks android.permission.SET_ANIMATION_SCALE
+    - adb shell am start -n no.finn.android_emulator_hacks/no.finn.android_emulator_hacks.HackActivity
+  override:
+    - ./gradlew assemble --console=plain
+    - ./gradlew check --console=plain
+    - ./gradlew jacocoUnitTestDebugReport --console=plain
+    - ./gradlew jacocoCombinedReport --console=plain
+  post:
+    # copy the build outputs to artifacts
+    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r app/build/reports $CIRCLE_ARTIFACTS
+    # copy the combined test results to the test results directory
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit
+    - cp app/build/reports/jacoco/jacocoCombinedReport/jacocoCombinedReport.xml $CIRCLE_TEST_REPORTS/junit/
