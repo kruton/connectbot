@@ -1,0 +1,48 @@
+<!--
+  ~ ConnectBot: simple, powerful, open-source SSH client for Android
+  ~ Copyright 2018 Kenny Root, Jeffrey Sharkey
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id="@+id/sort_by_color_menu_item"
+		android:icon="@android:drawable/ic_menu_share"
+		android:title="@string/list_menu_sortcolor"/>
+	<item
+		android:id="@+id/sort_by_name_menu_item"
+		android:icon="@android:drawable/ic_menu_share"
+		android:title="@string/list_menu_sortname"
+		android:visible="false"/>
+	<item
+		android:id="@+id/pubkeys_menu_item"
+		android:icon="@android:drawable/ic_lock_lock"
+		android:title="@string/list_menu_pubkeys"/>
+	<item
+		android:id="@+id/colors_menu_item"
+		android:icon="@drawable/ic_palette"
+		android:title="@string/title_colors"/>
+	<item
+		android:id="@+id/disconnect_all_menu_item"
+		android:icon="@android:drawable/ic_menu_delete"
+		android:title="@string/list_menu_disconnect"/>
+	<item
+		android:id="@+id/settings_menu_item"
+		android:icon="@android:drawable/ic_menu_preferences"
+		android:title="@string/list_menu_settings"/>
+	<item
+		android:id="@+id/help_menu_item"
+		android:icon="@android:drawable/ic_menu_help"
+		android:title="@string/title_help"/>
+</menu>

@@ -49,7 +49,7 @@
   <string name="prompt_host_disconnected">Servidor desconnectat.\nTancar sessió?</string>
   <string name="prompt_continue_connecting">Estàs segur que vols\ncontinuar connectant?</string>
   <string name="host_authenticity_warning">La autenticació amb el servidor \'%1$s\' no es pot establir.</string>
-  <string name="host_fingerprint">Servidor %1$s empremta de la clau és %2$s</string>
+  <string name="host_fingerprint">Servidor %1$s empremta de la clau és:</string>
   <string name="alert_passwords_do_not_match_msg">Les contrasenyes no coincideixen!</string>
   <string name="alert_wrong_password_msg">La contrasenya no és correcta.</string>
   <string name="alert_key_corrupted_msg">Les claus privades semblen malmèses!</string>
@@ -158,7 +158,7 @@
   <string name="delete_neg">Cancel·la</string>
   <string name="terminal_no_hosts_connected">No hi ha servidors connectats actualment</string>
   <string name="terminal_connecting">Connectant a %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Clau de servidor \'%1$s\' verificada: %2$s</string>
+  <string name="terminal_success">Clau de servidor \'%1$s\' verificada:</string>
   <string name="terminal_failed">Verificació de la clau del servidor errònia.</string>
   <string name="terminal_using_s2c_algorithm">Algoritme servidor-a-client: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritme client-a-servidor: %1$s %2$s</string>

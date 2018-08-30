@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">Hostitel se odpojil.\nUkončit sezení?</string>
   <string name="prompt_continue_connecting">Opravdu chcete\npokračovat v připojování?</string>
   <string name="host_authenticity_warning">Nelze ověřit nepodvrženost počítače „%1$s“.</string>
-  <string name="host_fingerprint">Otisk klíče počítače %1$s je %2$s</string>
+  <string name="host_fingerprint">Otisk klíče počítače %1$s je:</string>
   <string name="alert_passwords_do_not_match_msg">Zadání hesla se neshodují!</string>
   <string name="alert_wrong_password_msg">Chybné heslo!</string>
   <string name="alert_key_corrupted_msg">Soukromý klíč vypadá poškozeně!</string>
@@ -205,7 +205,7 @@
   <string name="disconnect_all_neg">Zrušit</string>
   <string name="terminal_no_hosts_connected">Žádný host není připojený</string>
   <string name="terminal_connecting">Připojování k %1$s:%2$d přes %3$s</string>
-  <string name="terminal_sucess">Klíč ověřeného hostitele \'%1$s\': %2$s</string>
+  <string name="terminal_success">Klíč ověřeného hostitele \'%1$s\':</string>
   <string name="terminal_failed">Selhalo ověření klíče hosta</string>
   <string name="terminal_using_s2c_algorithm">Algoritmus server-klient: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritmus klient-server: %1$s %2$s</string>

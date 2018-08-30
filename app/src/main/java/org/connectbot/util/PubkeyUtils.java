@@ -57,7 +57,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import org.connectbot.bean.PubkeyBean;
+import org.connectbot.db.entity.Pubkey;
 import org.keyczar.jce.EcCore;
 
 import com.trilead.ssh2.crypto.Base64;
@@ -68,15 +68,15 @@ import com.trilead.ssh2.signature.ECDSASHA2Verify;
 import com.trilead.ssh2.signature.Ed25519Verify;
 import com.trilead.ssh2.signature.RSASHA1Verify;
 
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import timber.log.Timber;
 
 public class PubkeyUtils {
 	static {
 		Ed25519Provider.insertIfNeeded();
 	}
-
-	private static final String TAG = "CB.PubkeyUtils";
 
 	public static final String PKCS8_START = "-----BEGIN PRIVATE KEY-----";
 	public static final String PKCS8_END = "-----END PRIVATE KEY-----";
@@ -133,39 +133,42 @@ public class PubkeyUtils {
 		return encrypt(pk.getEncoded(), secret);
 	}
 
-	public static PrivateKey decodePrivate(byte[] encoded, String keyType) throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public static PrivateKey decodePrivate(byte[] encoded, Pubkey.KeyType keyType) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encoded);
-		KeyFactory kf = KeyFactory.getInstance(keyType);
+		KeyFactory kf = KeyFactory.getInstance(keyType.toString());
 		return kf.generatePrivate(privKeySpec);
 	}
 
-	public static PrivateKey decodePrivate(byte[] encoded, String keyType, String secret) throws Exception {
+	public static PrivateKey decodePrivate(byte[] encoded, Pubkey.KeyType keyType, String secret) throws Exception {
 		if (secret != null && secret.length() > 0)
 			return decodePrivate(decrypt(encoded, secret), keyType);
 		else
 			return decodePrivate(encoded, keyType);
 	}
 
-	public static int getBitStrength(byte[] encoded, String keyType) throws InvalidKeySpecException,
+	public static int getBitStrength(@Nullable byte[] encoded, Pubkey.KeyType keyType) throws InvalidKeySpecException,
 			NoSuchAlgorithmException {
+		if (encoded == null) {
+			return 0;
+		}
 		final PublicKey pubKey = PubkeyUtils.decodePublic(encoded, keyType);
-		if (PubkeyDatabase.KEY_TYPE_RSA.equals(keyType)) {
+		if (Pubkey.KeyType.RSA.equals(keyType)) {
 			return ((RSAPublicKey) pubKey).getModulus().bitLength();
-		} else if (PubkeyDatabase.KEY_TYPE_DSA.equals(keyType)) {
+		} else if (Pubkey.KeyType.DSA.equals(keyType)) {
 			return 1024;
-		} else if (PubkeyDatabase.KEY_TYPE_EC.equals(keyType)) {
+		} else if (Pubkey.KeyType.EC.equals(keyType)) {
 			return ((ECPublicKey) pubKey).getParams().getCurve().getField()
 					.getFieldSize();
-		} else if (PubkeyDatabase.KEY_TYPE_ED25519.equals(keyType)) {
+		} else if (Pubkey.KeyType.ED25519.equals(keyType)) {
 			return 256;
 		} else {
 			return 0;
 		}
 	}
 
-	public static PublicKey decodePublic(byte[] encoded, String keyType) throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public static PublicKey decodePublic(@NonNull byte[] encoded, Pubkey.KeyType keyType) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encoded);
-		KeyFactory kf = KeyFactory.getInstance(keyType);
+		KeyFactory kf = KeyFactory.getInstance(keyType.toString());
 		return kf.generatePublic(pubKeySpec);
 	}
 
@@ -193,7 +196,7 @@ public class PubkeyUtils {
 			reader.resetInput(reader.readSequenceAsByteArray());
 			return reader.readOid();
 		} catch (IOException e) {
-			Log.w(TAG, "Could not read OID", e);
+			Timber.w(e, "Could not read OID");
 			throw new NoSuchAlgorithmException("Could not read key", e);
 		}
 	}
@@ -221,30 +224,30 @@ public class PubkeyUtils {
 			reader.readInt();  // modulus
 			return reader.readInt();  // public exponent
 		} catch (IOException e) {
-			Log.w(TAG, "Could not read public exponent", e);
+			Timber.w(e, "Could not read public exponent");
 			throw new InvalidKeySpecException("Could not read key", e);
 		}
 	}
 
-	public static KeyPair convertToKeyPair(PubkeyBean keybean, String password) throws BadPasswordException {
-		if (PubkeyDatabase.KEY_TYPE_IMPORTED.equals(keybean.getType())) {
+	public static KeyPair convertToKeyPair(Pubkey pubkey, String password) throws BadPasswordException {
+		if (Pubkey.KeyType.IMPORTED.equals(pubkey.getKeyType())) {
 			// load specific key using pem format
 			try {
-				return PEMDecoder.decode(new String(keybean.getPrivateKey(), "UTF-8").toCharArray(), password);
+				return PEMDecoder.decode(new String(pubkey.getPrivateKey(), "UTF-8").toCharArray(), password);
 			} catch (Exception e) {
-				Log.e(TAG, "Cannot decode imported key", e);
+				Timber.e(e, "Cannot decode imported key");
 				throw new BadPasswordException();
 			}
 		} else {
 			// load using internal generated format
 			try {
-				PrivateKey privKey = PubkeyUtils.decodePrivate(keybean.getPrivateKey(), keybean.getType(), password);
-				PublicKey pubKey = PubkeyUtils.decodePublic(keybean.getPublicKey(), keybean.getType());
-				Log.d(TAG, "Unlocked key " + PubkeyUtils.formatKey(pubKey));
+				PrivateKey privKey = PubkeyUtils.decodePrivate(pubkey.getPrivateKey(), pubkey.getKeyType(), password);
+				PublicKey pubKey = PubkeyUtils.decodePublic(pubkey.getPublicKey(), pubkey.getKeyType());
+				Timber.d("Unlocked key " + PubkeyUtils.formatKey(pubKey));
 
 				return new KeyPair(pubKey, privKey);
 			} catch (Exception e) {
-				Log.e(TAG, "Cannot decode pubkey from database", e);
+				Timber.e(e, "Cannot decode pubkey from database");
 				throw new BadPasswordException();
 			}
 		}
@@ -316,9 +319,9 @@ public class PubkeyUtils {
 			return data + " " + nickname;
 		} else if (pk instanceof ECPublicKey) {
 			ECPublicKey ecPub = (ECPublicKey) pk;
-			String keyType = ECDSASHA2Verify.getCurveName(ecPub.getParams().getCurve().getField().getFieldSize());
+			String curveSize = ECDSASHA2Verify.getCurveName(ecPub.getParams().getCurve().getField().getFieldSize());
 			String keyData = String.valueOf(Base64.encode(ECDSASHA2Verify.encodeSSHECDSAPublicKey(ecPub)));
-			return ECDSASHA2Verify.ECDSA_SHA2_PREFIX + keyType + " " + keyData + " " + nickname;
+			return ECDSASHA2Verify.ECDSA_SHA2_PREFIX + curveSize + " " + keyData + " " + nickname;
 		} else if (pk instanceof EdDSAPublicKey) {
 			EdDSAPublicKey edPub = (EdDSAPublicKey) pk;
 			return Ed25519Verify.ED25519_ID + " " +

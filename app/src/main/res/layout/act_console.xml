@@ -20,6 +20,7 @@
 
 <RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:background="#ff000000">
@@ -57,7 +58,7 @@
 			android:layout_marginBottom="5dip"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:visibility="gone"
-			/>
+			tools:text="Please enter your PIN:"/>
 
 		<EditText
 			android:id="@+id/console_password"
@@ -79,7 +80,7 @@
 		android:fadingEdge="horizontal"
 		android:fadingEdgeLength="25dip"
 		android:padding="5dip"
-		android:visibility="gone"
+		android:visibility="visible"
 		>
 
 		<TextView
@@ -87,7 +88,7 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textAppearance="?android:attr/textAppearanceMedium"
-			/>
+			tools:text="This is a generic prompt to answer?"/>
 
 		<Button
 			android:id="@+id/console_prompt_no"

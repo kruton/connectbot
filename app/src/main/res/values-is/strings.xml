@@ -47,7 +47,7 @@
   <string name="prompt_host_disconnected">Þjónninn hefur verið aftengdur.\nViltu loka?</string>
   <string name="prompt_continue_connecting">Ertu viss um að þú\nviljir halda áfram að tengjast?</string>
   <string name="host_authenticity_warning">Upprunaleiki lykilsins fyrir þjóninn \'%1$s\' getur ekki verið staðfestur.</string>
-  <string name="host_fingerprint">Þjónninn er %1$s fingrafar lykilsins er %2$s</string>
+  <string name="host_fingerprint">Þjónninn er %1$s fingrafar lykilsins er:</string>
   <string name="alert_passwords_do_not_match_msg">Lykilorðin passa ekki saman!</string>
   <string name="alert_wrong_password_msg">Rangt lykilorð!</string>
   <string name="alert_key_corrupted_msg">Einka lykillinn lítur út fyrir að vera skemmdur!</string>

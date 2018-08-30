@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ ConnectBot: simple, powerful, open-source SSH client for Android
+  ~ Copyright 2018 Kenny Root, Jeffrey Sharkey
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+		<variable
+			name="vm"
+			type="org.connectbot.ui.colors.ColorsViewModel"/>
+	</data>
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/colors_layout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		app:layout_constraintEnd_toEndOf="@+id/fg"
+		app:layout_constraintStart_toEndOf="@+id/fg">
+
+		<androidx.appcompat.widget.AppCompatSpinner
+			android:id="@+id/fg"
+			android:layout_width="206dp"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="8dp"
+			android:layout_marginStart="8dp"
+			android:layout_marginTop="8dp"
+			android:gravity="center"
+			android:minHeight="60dp"
+			android:onItemSelected="@{(parent, view, pos, id) -> vm.onFgSelected(pos)}"
+			android:paddingEnd="4dp"
+			android:paddingLeft="8dp"
+			android:paddingRight="4dp"
+			android:paddingStart="8dp"
+			android:paddingTop="8dp"
+			android:selection="@{vm.fgColor}"
+			app:layout_constraintEnd_toStartOf="@+id/bg"
+			app:layout_constraintHorizontal_bias="0.5"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			tools:listitem="@layout/item_color_spinner"/>
+
+		<androidx.appcompat.widget.AppCompatSpinner
+			android:id="@+id/bg"
+			android:layout_width="206dp"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="8dp"
+			android:layout_marginRight="8dp"
+			android:layout_marginTop="8dp"
+			android:gravity="center"
+			android:minHeight="60dp"
+			android:onItemSelected="@{(parent, view, pos, id) -> vm.onBgSelected(pos)}"
+			android:paddingBottom="4dp"
+			android:paddingEnd="8dp"
+			android:paddingLeft="4dp"
+			android:paddingRight="8dp"
+			android:paddingStart="4dp"
+			android:paddingTop="8dp"
+			android:selection="@{vm.bgColor}"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintHorizontal_bias="0.5"
+			app:layout_constraintStart_toEndOf="@+id/fg"
+			app:layout_constraintTop_toTopOf="parent"
+			tools:listitem="@layout/item_color_spinner"/>
+
+		<androidx.constraintlayout.widget.Barrier
+			android:id="@+id/spinner_barrier"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			app:barrierDirection="bottom"
+			app:constraint_referenced_ids="fg,bg"/>
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/color_grid"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			android:columnWidth="60dp"
+			android:gravity="center"
+			android:paddingBottom="8dp"
+			android:paddingEnd="4dp"
+			android:paddingLeft="4dp"
+			android:paddingRight="4dp"
+			android:paddingStart="4dp"
+			android:paddingTop="4dp"
+			app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/bg"/>
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -67,7 +67,7 @@
   <string name="prompt_host_disconnected">Sambungan dengan host telah terputus.\nTutup sesi ini?</string>
   <string name="prompt_continue_connecting">Apakah Anda yakin ingin\nterus mencoba menyambungkan?</string>
   <string name="host_authenticity_warning">Authentifikasi dari host \'%1$s\' tidak dapat dibuat.</string>
-  <string name="host_fingerprint">Host %1$s tanda tangan kunci adalah %2$s</string>
+  <string name="host_fingerprint">Host %1$s tanda tangan kunci adalah:</string>
   <string name="alert_passwords_do_not_match_msg">Kata sandi tidak cocok!</string>
   <string name="alert_wrong_password_msg">Kata sandi salah!</string>
   <string name="alert_key_corrupted_msg">Kunci pribadi nampaknya telah rusak!</string>
@@ -173,7 +173,7 @@
   <string name="delete_neg">Batal</string>
   <string name="terminal_no_hosts_connected">Tidak ada host yang saat ini terhubung</string>
   <string name="terminal_connecting">Menyambungkan ke %1$s:%2$d melalui %3$s</string>
-  <string name="terminal_sucess">Host terverifikasi \'%1$s\' kunci: %2$s</string>
+  <string name="terminal_success">Host terverifikasi \'%1$s\' kunci:</string>
   <string name="terminal_failed">Verifikasi kunci host gagal.</string>
   <string name="terminal_using_s2c_algorithm">Algoritma server-ke-klien: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritma klien-ke-server: %1$s %2$s</string>

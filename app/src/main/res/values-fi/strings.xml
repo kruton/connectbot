@@ -48,7 +48,7 @@
   <string name="prompt_host_disconnected">Palvelin katkaisi yhteyden.\nSuljetaanko istunto?</string>
   <string name="prompt_continue_connecting">Haluatko varmasti\njatkaa yhdistämistä?</string>
   <string name="host_authenticity_warning">Palvelimen \'%1$s\' aitoutta ei voida varmentaa</string>
-  <string name="host_fingerprint">Palvelimen %1$s avaimen sormenjälki: %2$s</string>
+  <string name="host_fingerprint">Palvelimen %1$s avaimen sormenjälki:</string>
   <string name="alert_passwords_do_not_match_msg">Salasanat eivät täsmää!</string>
   <string name="alert_wrong_password_msg">Väärä salasana!</string>
   <string name="alert_key_corrupted_msg">Yksityinen avain vaikuttaa korruptoituneelta.</string>
@@ -155,7 +155,7 @@
   <string name="delete_neg">Peru</string>
   <string name="terminal_no_hosts_connected">Yhteenkään palvelimeen ei ole yhdistetty</string>
   <string name="terminal_connecting">Muodostetaan %3$s-yhteys palvelimeen %1$s:%2$d</string>
-  <string name="terminal_sucess">Varmennettiin palvelin \'%1$s\' avain: %2$s</string>
+  <string name="terminal_success">Varmennettiin palvelin \'%1$s\' avain:</string>
   <string name="terminal_failed">Palvelimen avaimen varmistaminen epäonnistui</string>
   <string name="terminal_using_s2c_algorithm">Salausalgoritmi palvelimelta asiakkaalle: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Salausalgoritmi asiakkaalta palvelimelle: %1$s %2$s</string>

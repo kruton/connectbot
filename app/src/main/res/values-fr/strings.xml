@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">L\'hôte s\'est déconnecté.\nFermer la session ?</string>
   <string name="prompt_continue_connecting">Êtes-vous sûr de vouloir\ncontinuer à vous connecter ?</string>
   <string name="host_authenticity_warning">L\'authenticité du serveur \'%1$s\' ne peut être établie</string>
-  <string name="host_fingerprint">L\'empreinte de la clé du serveur %1$s est %2$s</string>
+  <string name="host_fingerprint">L\'empreinte de la clé du serveur %1$s est:</string>
   <string name="alert_passwords_do_not_match_msg">Les mots de passe sont différents !</string>
   <string name="alert_wrong_password_msg">Mauvais mot de passe !</string>
   <string name="alert_key_corrupted_msg">La clé privé semble corrompue !</string>
@@ -205,7 +205,7 @@
   <string name="disconnect_all_neg">Annuler</string>
   <string name="terminal_no_hosts_connected">Aucun hôte actuellement connecté</string>
   <string name="terminal_connecting">Connexion à %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Clé de vérification de l\'hôte \'%1$s\' : %2$s</string>
+  <string name="terminal_success">Clé de vérification de l\'hôte \'%1$s\' :</string>
   <string name="terminal_failed">Authentification par clé échouée</string>
   <string name="terminal_using_s2c_algorithm">Algorithme serveur vers client : %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algorithme client vers serveur : %1$s %2$s</string>

@@ -1,0 +1,122 @@
+/*
+ * ConnectBot: simple, powerful, open-source SSH client for Android
+ * Copyright 2018 Kenny Root, Jeffrey Sharkey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.connectbot.ui.portforwardedit
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingComponent
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
+import dagger.android.support.DaggerFragment
+import org.connectbot.AppExecutors
+import org.connectbot.R
+import org.connectbot.binding.FragmentDataBindingComponent
+import org.connectbot.databinding.FragmentPortForwardEditBinding
+import org.connectbot.ui.common.createPopUp
+import org.connectbot.util.ResourceProvider
+import org.connectbot.util.autoCleared
+import javax.inject.Inject
+
+class PortForwardEditFragment: DaggerFragment() {
+	@Inject
+	lateinit var viewModelFactory: ViewModelProvider.Factory
+
+	private lateinit var viewModel: PortForwardEditViewModel
+
+	@Inject
+	lateinit var appExecutors: AppExecutors
+
+	private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
+	var binding by autoCleared<FragmentPortForwardEditBinding>()
+
+	override fun onActivityCreated(savedInstanceState: Bundle?) {
+		super.onActivityCreated(savedInstanceState)
+
+		viewModel = ViewModelProviders.of(this, viewModelFactory)[PortForwardEditViewModel::class.java]
+
+		with(binding) {
+			vm = viewModel
+			setLifecycleOwner(viewLifecycleOwner)
+		}
+
+		val args = PortForwardEditFragmentArgs.fromBundle(arguments)
+
+		with(viewModel) {
+			typeClicked.observe(viewLifecycleOwner, Observer { v -> popupTypeList(v) })
+			fragmentFinished.observe(viewLifecycleOwner, Observer { findNavController().navigateUp() })
+			resourceProvider.value = ResourceProvider(resources)
+			hostId.value = args.hostId
+			onPortForwardId(args.portForwardId)
+		}
+	}
+
+	override fun onDetach() {
+		super.onDetach()
+
+		viewModel.resourceProvider.value = null
+	}
+
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		val dataBinding = DataBindingUtil.inflate<FragmentPortForwardEditBinding>(
+			inflater,
+			R.layout.fragment_port_forward_edit,
+			container,
+			false,
+			dataBindingComponent
+		)
+		binding = dataBinding
+		return dataBinding.root
+	}
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setHasOptionsMenu(true)
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+		inflater?.inflate(R.menu.host_edit, menu)
+	}
+
+	override fun onPrepareOptionsMenu(menu: Menu?) {
+		menu?.let {
+			it.findItem(R.id.add).isVisible = !viewModel.existingPortForward
+			it.findItem(R.id.save).isVisible = viewModel.existingPortForward
+		}
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+		when (item?.itemId) {
+			R.id.save -> viewModel.onSaveButtonClicked()
+			R.id.add -> viewModel.onSaveButtonClicked()
+			else -> return false
+		}
+		return true
+	}
+
+	private fun popupTypeList(v: View) {
+		createPopUp(viewLifecycleOwner, v, viewModel::onTypeSelected, viewModel.typeNamesValues)
+	}
+}

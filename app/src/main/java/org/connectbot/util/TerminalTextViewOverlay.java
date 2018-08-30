@@ -18,15 +18,13 @@
 package org.connectbot.util;
 
 import org.connectbot.R;
-import org.connectbot.TerminalView;
-import org.connectbot.service.TerminalBridge;
+import org.connectbot.ui.console.TerminalView;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
-import androidx.core.view.MotionEventCompat;
 import android.text.ClipboardManager;
 import android.view.ActionMode;
 import android.view.InputDevice;
@@ -37,6 +35,8 @@ import android.view.MotionEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
+import androidx.core.view.MotionEventCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import de.mud.terminal.VDUBuffer;
 import de.mud.terminal.vt320;
 
@@ -364,11 +364,13 @@ public class TerminalTextViewOverlay extends androidx.appcompat.widget.AppCompat
 
 			menu.clear();
 
+			VectorDrawableCompat copyIcon = VectorDrawableCompat.create(getResources(), R.drawable.ic_action_copy, null);
 			menu.add(0, COPY, 0, R.string.console_menu_copy)
-					.setIcon(R.drawable.ic_action_copy)
+					.setIcon(copyIcon)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT | MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			VectorDrawableCompat pasteIcon = VectorDrawableCompat.create(getResources(), R.drawable.ic_action_paste, null);
 			menu.add(0, PASTE, 1, R.string.console_menu_paste)
-					.setIcon(R.drawable.ic_action_paste)
+					.setIcon(pasteIcon)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT | MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 			return true;

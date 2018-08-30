@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">Host đã mất kết nối.\nĐóng phiên làm việc?</string>
   <string name="prompt_continue_connecting">Bạn có muốn\ntiếp tục kết nối?</string>
   <string name="host_authenticity_warning">Xác thực của host \'%1$s\' không thể thực hiện được.</string>
-  <string name="host_fingerprint">Máy chủ %1$s key fingerprint là %2$s</string>
+  <string name="host_fingerprint">Máy chủ %1$s key fingerprint là:</string>
   <string name="alert_passwords_do_not_match_msg">Các mật khẩu không khớp nhau</string>
   <string name="alert_wrong_password_msg">Sai mật khẩu!</string>
   <string name="alert_key_corrupted_msg">Có thể khoá bí mật đã bị hỏng!</string>
@@ -201,7 +201,7 @@
   <string name="disconnect_all_neg">Hủy</string>
   <string name="terminal_no_hosts_connected">Hiện không có host nào đang kết nối</string>
   <string name="terminal_connecting">"Đang kết nối  %1$s:%2$d qua %3$s"</string>
-  <string name="terminal_sucess">Đã xác thực host \'%1$s\' key: %2$s</string>
+  <string name="terminal_success">Đã xác thực host \'%1$s\' key:</string>
   <string name="terminal_failed">Xác thực host key thất bại</string>
   <string name="terminal_using_s2c_algorithm">Thuật toán Server-to-client: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Thuật toán Client-to-server: %1$s %2$s</string>

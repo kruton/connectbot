@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ ConnectBot: simple, powerful, open-source SSH client for Android
+  ~ Copyright 2007 Kenny Root, Jeffrey Sharkey
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+
+		<variable
+			name="vm"
+			type="org.connectbot.ui.generate.GeneratePubkeyViewModel"/>
+	</data>
+
+	<androidx.core.widget.NestedScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:scrollbars="vertical"
+		tools:showIn="@layout/main_activity">
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/generate_layout"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:animateLayoutChanges="true"
+			android:scrollbars="vertical">
+
+			<ImageView
+				android:id="@+id/nickname_image"
+				style="@style/ListItemIcon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginStart="16dp"
+				android:contentDescription="@null"
+				android:importantForAccessibility="no"
+				app:layout_constraintBottom_toBottomOf="@+id/nickname_layout"
+				app:layout_constraintEnd_toStartOf="@+id/icon_guideline"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@id/nickname_layout"
+				app:srcCompat="@drawable/ic_person"
+				tools:ignore="UnusedAttribute"/>
+
+			<com.google.android.material.textfield.TextInputLayout
+				android:id="@+id/nickname_layout"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:layout_marginTop="16dp"
+				android:labelFor="@+id/nickname"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toTopOf="parent">
+
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@+id/nickname"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/prompt_nickname"
+					android:text="@={vm.nickname}"/>
+
+			</com.google.android.material.textfield.TextInputLayout>
+
+			<ImageView
+				android:id="@+id/key_type_icon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="8dp"
+				android:contentDescription="@null"
+				android:importantForAccessibility="no"
+				app:layout_constraintBottom_toBottomOf="@+id/key_type_text"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/key_type_title"
+				app:srcCompat="@drawable/ic_key_type"
+				tools:ignore="UnusedAttribute"/>
+
+			<TextView
+				android:id="@+id/key_type_title"
+				style="@style/ListItemFirstLineText.WithIcon"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:enabled="@{vm.keyTypeEnabled}"
+				android:labelFor="@+id/key_type_text"
+				android:onClick="@{vm.keyTypeClicked}"
+				android:text="@string/prompt_type"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@id/nickname_layout"
+				app:layout_constraintVertical_chainStyle="spread_inside"/>
+
+			<TextView
+				android:id="@+id/key_type_text"
+				style="@style/ListItemSecondLineText.WithIcon"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:enabled="@{vm.keyTypeEnabled}"
+				android:onClick="@{vm.keyTypeClicked}"
+				android:text="@{vm.keyType}"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/key_type_title"
+				tools:text="RSA"/>
+
+			<ImageView
+				android:id="@+id/key_curve_icon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="8dp"
+				android:contentDescription="@null"
+				android:importantForAccessibility="no"
+				app:layout_constraintBottom_toBottomOf="@+id/key_curve_text"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/key_curve_title"
+				app:srcCompat="@drawable/ic_bits_black_24dp"
+				app:visibleGone="@{vm.keyCurveVisible}"
+				tools:ignore="UnusedAttribute"/>
+
+			<TextView
+				android:id="@+id/key_curve_title"
+				style="@style/ListItemFirstLineText.WithIcon"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:labelFor="@+id/key_curve_text"
+				android:onClick="@{vm.keyCurveClicked}"
+				android:text="@string/prompt_ec_group"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@id/key_type_text"
+				app:layout_constraintVertical_chainStyle="spread_inside"
+				app:visibleGone="@{vm.keyCurveVisible}"/>
+
+			<TextView
+				android:id="@+id/key_curve_text"
+				style="@style/ListItemSecondLineText.WithIcon"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:onClick="@{vm.keyCurveClicked}"
+				android:text="@{vm.keyCurve}"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/key_curve_title"
+				app:visibleGone="@{vm.keyCurveVisible}"
+				tools:text="NIST P-256"/>
+
+			<androidx.constraintlayout.widget.Barrier
+				android:id="@+id/key_curve_barrier"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				app:barrierDirection="bottom"
+				app:constraint_referenced_ids="key_type_text,key_curve_text"/>
+
+			<ImageView
+				android:id="@+id/bits_icon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="8dp"
+				android:contentDescription="@null"
+				android:importantForAccessibility="no"
+				app:layout_constraintBottom_toBottomOf="@+id/bits_label"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/bits_label"
+				app:srcCompat="@drawable/ic_bits_black_24dp"
+				app:visibleGone="@{vm.bitsVisible}"
+				tools:ignore="UnusedAttribute"/>
+
+			<TextView
+				android:id="@+id/bits_label"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="4dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="4dp"
+				android:layout_marginStart="8dp"
+				android:labelFor="@+id/bits"
+				android:text="@string/prompt_bits"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				app:layout_constraintBottom_toBottomOf="@+id/bits"
+				app:layout_constraintEnd_toStartOf="@+id/bits"
+				app:layout_constraintStart_toEndOf="@id/icon_guideline"
+				app:layout_constraintTop_toTopOf="@+id/bits"
+				app:visibleGone="@{vm.bitsVisible}"/>
+
+			<EditText
+				android:id="@+id/bits"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="4dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="4dp"
+				android:importantForAutofill="no"
+				android:inputType="number"
+				android:singleLine="true"
+				android:text="@{vm.bitsText}"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintHorizontal_bias="0.5"
+				app:layout_constraintStart_toEndOf="@+id/bits_label"
+				app:layout_constraintTop_toBottomOf="@id/key_curve_barrier"
+				app:updateOnFocusLost="@{(t) -> vm.onBitsTextUpdated(t)}"
+				app:visibleGone="@{vm.bitsVisible}"
+				tools:ignore="UnusedAttribute"
+				tools:text="1024"/>
+
+			<SeekBar
+				android:id="@+id/bits_slider"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:layout_marginTop="8dp"
+				android:max="@{vm.sliderMaximumValue}"
+				android:onProgressChanged="@{(sb, progress, fromUser) -> vm.onBitsSliderChanged(progress, fromUser)}"
+				android:padding="8dp"
+				android:progress="@{vm.sliderProgress}"
+				app:layout_constraintBottom_toTopOf="@+id/bits_barrier"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@id/bits"
+				app:visibleGone="@{vm.bitsVisible}"/>
+
+			<TextView
+				android:id="@+id/security_warning_text"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="8dp"
+				android:layout_marginStart="8dp"
+				android:layout_marginTop="4dp"
+				android:text="@string/pubkey_strength_warning"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:textColor="@color/red"
+				app:viewVisibility="@{vm.securityWarningShow}"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toEndOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/bits_slider"
+				/>
+
+			<TextView
+				android:id="@+id/performance_warning_text"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="8dp"
+				android:layout_marginStart="8dp"
+				android:layout_marginTop="4dp"
+				android:text="@string/pubkey_performance_warning"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:textColor="@color/red"
+				app:viewVisibility="@{vm.performanceWarningShow}"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toEndOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/bits_slider"
+				/>
+
+			<androidx.constraintlayout.widget.Barrier
+				android:id="@+id/bits_barrier"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				app:barrierDirection="bottom"
+				app:constraint_referenced_ids="key_type_text,key_curve_text,bits_slider,performance_warning_text,security_warning_text"/>
+
+			<ImageView
+				android:id="@+id/password_icon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="8dp"
+				android:contentDescription="@null"
+				android:importantForAccessibility="no"
+				app:layout_constraintBottom_toTopOf="@+id/password2_layout"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/password1_layout"
+				app:srcCompat="@drawable/ic_lock_black_24dp"
+				tools:ignore="UnusedAttribute"/>
+
+			<com.google.android.material.textfield.TextInputLayout
+				android:id="@+id/password1_layout"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:labelFor="@+id/nickname"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@id/bits_barrier">
+
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@+id/password1"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/prompt_password"
+					android:text="@={vm.password1}"
+					tools:text="@tools:sample/lorem"/>
+
+			</com.google.android.material.textfield.TextInputLayout>
+
+			<com.google.android.material.textfield.TextInputLayout
+				android:id="@+id/password2_layout"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:labelFor="@+id/nickname"
+				app:error="@{vm.passwordError}"
+				app:errorEnabled="true"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@id/password1_layout">
+
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@+id/password2"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/prompt_password"
+					android:text="@{vm.password2}"
+					app:updateOnFocusLost="@{(text) -> vm.onPassword2Changed(text)}"/>
+
+			</com.google.android.material.textfield.TextInputLayout>
+
+			<org.connectbot.views.CheckableMenuItem
+				android:id="@+id/load_key_on_start"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:checked="@={vm.loadKeyOnStart}"
+				android:icon="@drawable/ic_load_on_start_black_24dp"
+				android:title="@string/pubkey_load_on_start"
+				app:layout_constraintBottom_toTopOf="@+id/confirm_use"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/password2_layout"/>
+
+			<org.connectbot.views.CheckableMenuItem
+				android:id="@+id/confirm_use"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:checked="@={vm.confirmBeforeUse}"
+				android:icon="@drawable/ic_confirm_use_black_24dp"
+				android:title="@string/pubkey_confirm_use"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/load_key_on_start"/>
+
+			<androidx.constraintlayout.widget.Guideline
+				android:id="@+id/icon_guideline"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				app:layout_constraintGuide_begin="50dp"/>
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
+
+	</androidx.core.widget.NestedScrollView>
+
+</layout>

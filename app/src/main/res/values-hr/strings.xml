@@ -48,7 +48,7 @@
   <string name="prompt_host_disconnected">Računalo se odspojilo.\nZatvori sesiju?</string>
   <string name="prompt_continue_connecting">Jeste li sigurni da želite\nnastaviti sa spajanjem?</string>
   <string name="host_authenticity_warning">Autentičnost računala \'%1$s\' se ne može provjeriti.</string>
-  <string name="host_fingerprint">%1$s ključ računala je %2$s</string>
+  <string name="host_fingerprint">%1$s ključ računala je:</string>
   <string name="alert_passwords_do_not_match_msg">Zaporke nisu iste!</string>
   <string name="alert_wrong_password_msg">Kriva zaporka!</string>
   <string name="alert_key_corrupted_msg">Privatni ključ je oštećen!</string>

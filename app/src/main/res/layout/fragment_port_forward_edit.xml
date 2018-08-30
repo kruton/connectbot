@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ ConnectBot: simple, powerful, open-source SSH client for Android
+  ~ Copyright 2018 Kenny Root, Jeffrey Sharkey
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+		<variable
+			name="vm"
+			type="org.connectbot.ui.portforwardedit.PortForwardEditViewModel"/>
+	</data>
+
+	<androidx.core.widget.NestedScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/port_forward_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:animateLayoutChanges="true">
+
+			<ImageView
+				android:id="@+id/nickname_image"
+				style="@style/ListItemIcon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginStart="16dp"
+				android:contentDescription="@null"
+				app:layout_constraintBottom_toBottomOf="@+id/nickname_layout"
+				app:layout_constraintEnd_toStartOf="@+id/icon_guideline"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/nickname_layout"
+				app:srcCompat="@drawable/ic_person"/>
+
+			<com.google.android.material.textfield.TextInputLayout
+				android:id="@+id/nickname_layout"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:layout_marginTop="16dp"
+				android:accessibilityLiveRegion="polite"
+				android:contentDescription="@string/prompt_nickname"
+				android:labelFor="@+id/nickname_field"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@id/icon_guideline"
+				app:layout_constraintTop_toTopOf="parent"
+				tools:ignore="UnusedAttribute">
+
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@id/nickname_field"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/prompt_nickname"
+					android:inputType="text"
+					android:maxLines="1"
+					android:text="@={vm.nickname}"/>
+
+			</com.google.android.material.textfield.TextInputLayout>
+
+			<ImageView
+				android:id="@+id/type_image"
+				style="@style/ListItemIcon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginStart="16dp"
+				android:contentDescription="@null"
+				app:layout_constraintBottom_toBottomOf="@+id/type_text"
+				app:layout_constraintEnd_toStartOf="@+id/icon_guideline"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/nickname_layout"
+				app:layout_constraintTop_toTopOf="@+id/type_title"
+				app:srcCompat="@drawable/ic_sync"/>
+
+			<TextView
+				android:id="@+id/type_title"
+				style="@style/ListItemFirstLineText.WithIcon"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:onClick="@{vm.typeClicked}"
+				android:text="@string/prompt_type"
+				app:layout_constraintBottom_toTopOf="@+id/type_text"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toEndOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/nickname_layout"/>
+
+			<TextView
+				android:id="@+id/type_text"
+				style="@style/ListItemSecondLineText.WithIcon"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:onClick="@{vm.typeClicked}"
+				android:text="@{vm.type}"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toEndOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/type_title"
+				tools:text="Local"/>
+
+			<ImageView
+				android:id="@+id/source_port_image"
+				style="@style/ListItemIcon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginStart="16dp"
+				android:contentDescription="@null"
+				app:layout_constraintBottom_toBottomOf="@+id/source_port_layout"
+				app:layout_constraintEnd_toStartOf="@+id/icon_guideline"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/type_text"
+				app:layout_constraintTop_toTopOf="@+id/source_port_layout"
+				app:srcCompat="@drawable/ic_source_black_24dp"/>
+
+			<com.google.android.material.textfield.TextInputLayout
+				android:id="@+id/source_port_layout"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:accessibilityLiveRegion="polite"
+				android:contentDescription="@string/prompt_source_port"
+				android:labelFor="@+id/nickname_field"
+				app:error="@{vm.sourcePortError}"
+				app:errorEnabled="true"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/type_text"
+				tools:ignore="UnusedAttribute">
+
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@+id/source_port_field"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/prompt_source_port"
+					android:inputType="number"
+					android:maxLines="1"
+					android:text="@{vm.sourcePortText}"
+					app:updateOnFocusLost="@{(v) -> vm.onSourcePortChanged(v)}"/>
+
+			</com.google.android.material.textfield.TextInputLayout>
+
+			<ImageView
+				android:id="@+id/destination_image"
+				style="@style/ListItemIcon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="8dp"
+				android:layout_marginStart="16dp"
+				android:contentDescription="@null"
+				app:layout_constraintBottom_toBottomOf="@+id/destination_layout"
+				app:layout_constraintEnd_toStartOf="@+id/icon_guideline"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/source_port_layout"
+				app:layout_constraintTop_toTopOf="@+id/destination_layout"
+				app:srcCompat="@drawable/ic_destination_black_24dp"
+				app:visibleGone="@{vm.destinationVisible}"/>
+
+			<com.google.android.material.textfield.TextInputLayout
+				android:id="@+id/destination_layout"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="8dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginStart="8dp"
+				android:accessibilityLiveRegion="polite"
+				android:contentDescription="@string/prompt_nickname"
+				android:labelFor="@+id/nickname_field"
+				app:error="@{vm.destinationError}"
+				app:errorEnabled="true"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="@+id/icon_guideline"
+				app:layout_constraintTop_toBottomOf="@+id/source_port_layout"
+				app:visibleGone="@{vm.destinationVisible}"
+				tools:ignore="UnusedAttribute">
+
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@+id/destination_field"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/prompt_destination"
+					android:inputType="text"
+					android:maxLines="1"
+					android:text="@{vm.destination}"
+					app:updateOnFocusLost="@{(v) -> vm.onDestinationChanged(v)}"/>
+
+			</com.google.android.material.textfield.TextInputLayout>
+
+			<androidx.constraintlayout.widget.Guideline
+				android:id="@+id/icon_guideline"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				app:layout_constraintGuide_begin="50dp"/>
+
+		</androidx.constraintlayout.widget.ConstraintLayout>
+	</androidx.core.widget.NestedScrollView>
+</layout>

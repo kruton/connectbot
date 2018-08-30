@@ -22,4 +22,9 @@
 		<attr name="android:title" />
 		<attr name="summary" format="string" />
 	</declare-styleable>
+
+	<declare-styleable name="StrokedTextView">
+		<attr name="textStrokeColor" format="color"/>
+		<attr name="textStrokeWidth" format="dimension"/>
+	</declare-styleable>
 </resources>

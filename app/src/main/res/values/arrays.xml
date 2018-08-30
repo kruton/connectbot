@@ -111,6 +111,12 @@
 		<item>@string/portforward_dynamic</item>
 	</string-array>
 
+	<string-array name="list_portforward_types_values" translatable="false">
+		<item>local</item>
+		<item>remote</item>
+		<item>dynamic5</item>
+	</string-array>
+
 	<string-array name="list_delkey" translatable="false">
 		<item>@string/list_delkey_del</item>
 		<item>@string/list_delkey_backspace</item>

@@ -63,7 +63,7 @@
   <string name="prompt_host_disconnected">Hospede desconectou-se.\nFechar sessão?</string>
   <string name="prompt_continue_connecting">Tem a certeza que quer\ncontinuar a connectar?</string>
   <string name="host_authenticity_warning">A autenticidade do anfitrião \'%1$s\' não pode ser verificada.</string>
-  <string name="host_fingerprint">Hospede %1$s id da chave é %2$s</string>
+  <string name="host_fingerprint">Hospede %1$s id da chave é:</string>
   <string name="alert_passwords_do_not_match_msg">As palavras passe não coincidem!</string>
   <string name="alert_wrong_password_msg">Palavra passe errada!</string>
   <string name="alert_key_corrupted_msg">Chave privada parece estar corrupta.</string>
@@ -174,7 +174,7 @@
   <string name="delete_neg">Cancelar</string>
   <string name="terminal_no_hosts_connected">Nenhum anfitrião ligado actualmente</string>
   <string name="terminal_connecting">A ligar a %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Verificado anfitrião \'%1$s\' chave: %2$s</string>
+  <string name="terminal_success">Verificado anfitrião \'%1$s\' chave:</string>
   <string name="terminal_failed">Verificação da chave do anfitrião falhou.</string>
   <string name="terminal_using_s2c_algorithm">Algoritmo servidor-cliente: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritmo cliente-servidor: %1$s %2$s</string>

@@ -20,11 +20,11 @@ package org.connectbot.util;
 import org.connectbot.R;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.SeekBar;
 import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceDialogFragmentCompat;
-import android.view.View;
-import android.widget.SeekBar;
 
 /**
  * Created by kenny on 2/20/17.

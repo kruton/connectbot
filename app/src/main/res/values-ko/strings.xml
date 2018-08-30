@@ -46,7 +46,7 @@
   <string name="host_verification_failure_warning">누군가가 나쁜 짓을 하고 있는 것일 수 있습니다!\n지금 누군가가 당신을 도청하고 있을 수도 있습니다 (중간자 공격)!\n또는, 단순히 호스트 키가 바뀐 것일 수도 있습니다.</string>
   <string name="prompt_host_disconnected">호스트 연결이 끊겼습니다.\n세션을 닫을까요?</string>
   <string name="prompt_continue_connecting">정말로 연결을 진행하기\n바랍니까?</string>
-  <string name="host_fingerprint">호스트 %1$s 키 지문은 %2$s</string>
+  <string name="host_fingerprint">호스트 %1$s 키 지문은：</string>
   <string name="alert_passwords_do_not_match_msg">암호가 맞지 않습니다!</string>
   <string name="alert_wrong_password_msg">잘못된 암호입니다!</string>
   <string name="alert_key_corrupted_msg">개인 키가 손상되었습니다!</string>

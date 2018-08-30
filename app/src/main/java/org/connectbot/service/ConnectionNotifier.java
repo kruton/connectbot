@@ -17,11 +17,10 @@
 
 package org.connectbot.service;
 
-import org.connectbot.ConsoleActivity;
-import org.connectbot.HostListActivity;
 import org.connectbot.R;
-import org.connectbot.bean.HostBean;
-import org.connectbot.util.HostDatabase;
+import org.connectbot.db.entity.Host;
+import org.connectbot.transport.TransportFactory;
+import org.connectbot.ui.hosts.HostsFragmentArgs;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -35,6 +34,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
+import androidx.navigation.NavDeepLinkBuilder;
 
 /**
  * @author Kenny Root
@@ -83,7 +83,7 @@ public class ConnectionNotifier {
 		getNotificationManager(context).createNotificationChannel(nc);
 	}
 
-	private Notification newActivityNotification(Context context, HostBean host) {
+	private Notification newActivityNotification(Context context, Host host) {
 		NotificationCompat.Builder builder = newNotificationBuilder(context, NOTIFICATION_CHANNEL);
 
 		Resources res = context.getResources();
@@ -93,7 +93,7 @@ public class ConnectionNotifier {
 
 		Intent notificationIntent = new Intent(context, ConsoleActivity.class);
 		notificationIntent.setAction("android.intent.action.VIEW");
-		notificationIntent.setData(host.getUri());
+		notificationIntent.setData(TransportFactory.getUriForHost(host));
 
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
 				notificationIntent, 0);
@@ -107,11 +107,11 @@ public class ConnectionNotifier {
 		int ledOnMS = 300;
 		int ledOffMS = 1000;
 		builder.setDefaults(Notification.DEFAULT_LIGHTS);
-		if (HostDatabase.COLOR_RED.equals(host.getColor()))
+		if (Host.HostColor.RED.equals(host.getColor()))
 			builder.setLights(Color.RED, ledOnMS, ledOffMS);
-		else if (HostDatabase.COLOR_GREEN.equals(host.getColor()))
+		else if (Host.HostColor.GREEN.equals(host.getColor()))
 			builder.setLights(Color.GREEN, ledOnMS, ledOffMS);
-		else if (HostDatabase.COLOR_BLUE.equals(host.getColor()))
+		else if (Host.HostColor.BLUE.equals(host.getColor()))
 			builder.setLights(Color.BLUE, ledOnMS, ledOffMS);
 		else
 			builder.setLights(Color.WHITE, ledOnMS, ledOffMS);
@@ -133,21 +133,20 @@ public class ConnectionNotifier {
 		builder.setContentTitle(res.getString(R.string.app_name));
 		builder.setContentText(res.getString(R.string.app_is_running));
 
-		Intent disconnectIntent = new Intent(context, HostListActivity.class);
-		disconnectIntent.setAction(HostListActivity.DISCONNECT_ACTION);
+		HostsFragmentArgs args = new HostsFragmentArgs.Builder().setDisconnectAction(true).build();
+		PendingIntent pi = new NavDeepLinkBuilder(context).setGraph(R.navigation.nav_graph)
+			.setDestination(R.id.hosts)
+			.setArguments(args.toBundle())
+			.createPendingIntent();
 		builder.addAction(
-				android.R.drawable.ic_menu_close_clear_cancel,
-				res.getString(R.string.list_host_disconnect),
-				PendingIntent.getActivity(
-						context,
-						ONLINE_DISCONNECT_NOTIFICATION,
-						disconnectIntent,
-						0));
+			android.R.drawable.ic_menu_close_clear_cancel,
+			res.getString(R.string.list_host_disconnect),
+			pi);
 
 		return builder.build();
 	}
 
-	void showActivityNotification(Service context, HostBean host) {
+	void showActivityNotification(Service context, Host host) {
 		getNotificationManager(context).notify(ACTIVITY_NOTIFICATION, newActivityNotification(context, host));
 	}
 

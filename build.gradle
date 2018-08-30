@@ -1,63 +1,25 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    project.ext.MAVEN_REPO_CACHE = System.getenv("MAVEN_REPO_CACHE")?.trim()
     project.ext.TRANSLATIONS_ONLY = System.getenv("TRANSLATIONS_ONLY")?.trim()
-    if (MAVEN_REPO_CACHE) {
-        repositories { maven { url MAVEN_REPO_CACHE } }
-    } else {
-        repositories {
-            google()
-            jcenter()
-            google()
-        }
-    }
+    apply from: "versions.gradle"
+    addRepos(repositories)
 }
 
-plugins { id 'com.diffplug.gradle.spotless' version '3.16.0' }
-apply plugin: 'com.diffplug.gradle.spotless'
+plugins { id "com.diffplug.gradle.spotless" version "3.16.0" }
 
-if (MAVEN_REPO_CACHE) {
-    allprojects {
-        buildscript {
-            repositories { maven { url MAVEN_REPO_CACHE } }
-        }
-        repositories { maven { url MAVEN_REPO_CACHE } }
+allprojects {
+    buildscript {
+        addRepos(repositories)
     }
-} else {
-    allprojects {
-        buildscript {
-            repositories {
-                google()
-                jcenter()
-                google()
-            }
-        }
-        repositories {
-            google()
-            jcenter()
-            google()
-        }
-    }
-}
-
-project.ext.preDexLibs = !project.hasProperty('disablePreDex')
-
-subprojects {
-    project.plugins.whenPluginAdded { plugin ->
-        if ("com.android.build.gradle.AppPlugin".equals(plugin.class.name)) {
-            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
-        } else if ("com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)) {
-            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
-        }
-    }
+    addRepos(repositories)
 }
 
 if (!TRANSLATIONS_ONLY) {
     apply from: 'spotless.gradle'
 }
 
-task resolveDependencies {
+tasks.register("resolveDependencies") {
     setDescription "Resolves all projects dependencies from the repository."
     setGroup "Build Server"
 

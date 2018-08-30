@@ -70,7 +70,7 @@
   <string name="prompt_host_disconnected">Vert har koblet fra.\nLukk sesjon?</string>
   <string name="prompt_continue_connecting">Er du sikker på at\ndu vil koble til?</string>
   <string name="host_authenticity_warning">Kan ikke bekrefte integriteten til \'%1$s\'.</string>
-  <string name="host_fingerprint">Nøkkelfingeravtrykk til vert %1$s er %2$s</string>
+  <string name="host_fingerprint">Nøkkelfingeravtrykk til vert %1$s er:</string>
   <string name="alert_passwords_do_not_match_msg">Passordene er ikke like!</string>
   <string name="alert_wrong_password_msg">Feil passord!</string>
   <string name="alert_key_corrupted_msg">Privat nøkkel ser ut til å være korrupt!</string>
@@ -179,7 +179,7 @@
   <string name="delete_neg">Avbryt</string>
   <string name="terminal_no_hosts_connected">Ingen verter tilkoblet for øyeblikket</string>
   <string name="terminal_connecting">Kobler til %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Verifiserte vert \'%1$s\' sin nøkkel: %2$s</string>
+  <string name="terminal_success">Verifiserte vert \'%1$s\' sin nøkkel:</string>
   <string name="terminal_failed">Verifisering av vertsnøkkelen feilet.</string>
   <string name="terminal_using_s2c_algorithm">Algoritme fra tjener til klient: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritme fra klient til tjener: %1$s %2$s</string>

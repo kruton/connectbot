@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">主机已经断开。\n关闭本次会话？</string>
   <string name="prompt_continue_connecting">你确定要\n继续连接？</string>
   <string name="host_authenticity_warning">主机「%1$s」的验证无法建立</string>
-  <string name="host_fingerprint">主机 %1$s 密钥指纹是 %2$s</string>
+  <string name="host_fingerprint">主机 %1$s 密钥指纹是：</string>
   <string name="alert_passwords_do_not_match_msg">密码不匹配！</string>
   <string name="alert_wrong_password_msg">密码错误！</string>
   <string name="alert_key_corrupted_msg">私钥似乎已损坏！</string>
@@ -204,7 +204,7 @@
   <string name="disconnect_all_neg">取消</string>
   <string name="terminal_no_hosts_connected">当前没有连接主机</string>
   <string name="terminal_connecting">正在通过%3$s连接到 %1$s:%2$d</string>
-  <string name="terminal_sucess">验证主机 %1$s 键值： %2$s</string>
+  <string name="terminal_success">验证主机 %1$s 键值：</string>
   <string name="terminal_failed">主机密钥验证失败。</string>
   <string name="terminal_using_s2c_algorithm">服务器到客户端算法：%1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">客户端到服务器算法：%1$s %2$s</string>

@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">已經中斷連線。\n是否關閉本次階段？</string>
   <string name="prompt_continue_connecting">是否要繼續連線？</string>
   <string name="host_authenticity_warning">主機\"%1$s\"的驗證無法建立。</string>
-  <string name="host_fingerprint">主機 %1$s 金鑰指紋是 %2$s</string>
+  <string name="host_fingerprint">主機 %1$s 金鑰指紋是：</string>
   <string name="alert_passwords_do_not_match_msg">密碼不符！</string>
   <string name="alert_wrong_password_msg">錯誤的密碼！</string>
   <string name="alert_key_corrupted_msg">私鑰已經損壞！</string>
@@ -204,7 +204,7 @@
   <string name="disconnect_all_neg">取消</string>
   <string name="terminal_no_hosts_connected">目前沒有已連線主機</string>
   <string name="terminal_connecting">連接到 %1$s:%2$d，通過 %3$s</string>
-  <string name="terminal_sucess">驗證主機 \'%1$s\' 金鑰：%2$s</string>
+  <string name="terminal_success">驗證主機 \'%1$s\' 金鑰：</string>
   <string name="terminal_failed">主機驗證失敗</string>
   <string name="terminal_using_s2c_algorithm">伺服器到用戶端算法：%1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">用戶端到伺服器算法：%1$s %2$s</string>

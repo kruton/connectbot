@@ -1,16 +1,18 @@
-apply plugin: 'checkstyle'
+apply plugin: "checkstyle"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
 
 checkstyle {
-    toolVersion = '8.10'
-    configDir = rootProject.file('config/quality/checkstyle')
+    toolVersion = "8.10"
+    configDir = rootProject.file("config/quality/checkstyle")
 }
 
-check.dependsOn 'checkstyle'
+check.dependsOn "checkstyle"
 
-task checkstyle(type: Checkstyle) {
-    source 'src/main/java'
-    include 'org/connectbot/**/*.java'
-    exclude '**/gen/**'
+tasks.register("checkstyle", Checkstyle) {
+    source = "src/main/java"
+    include("org/connectbot/**/*.java")
+    exclude("**/generated/**")
 
     classpath = files()
 }

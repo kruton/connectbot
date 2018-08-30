@@ -27,26 +27,26 @@ import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.StringRes;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.accessibility.AccessibilityEventCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.customview.widget.ExploreByTouchHelper;
-import androidx.appcompat.widget.SwitchCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityEventCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.customview.widget.ExploreByTouchHelper;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 /**
  * Created by kenny on 5/31/16.
  */
-public class CheckableMenuItem extends RelativeLayout {
+public class CheckableMenuItem extends ConstraintLayout {
 	private static final String ACCESSIBILITY_EVENT_CLASS_NAME = "android.widget.Switch";
 
 	private final Rect mPlaceHolderRect = new Rect(0, 0, 1, 1);
@@ -69,7 +69,7 @@ public class CheckableMenuItem extends RelativeLayout {
 
 		mTitle = mRootView.findViewById(R.id.title);
 		mSummary = mRootView.findViewById(R.id.summary);
-		mSwitch = findViewById(R.id.checkbox_switch);
+		mSwitch = mRootView.findViewById(R.id.checkbox_switch);
 
 		setFocusable(true);
 
@@ -95,7 +95,7 @@ public class CheckableMenuItem extends RelativeLayout {
 
 				event.setContentDescription(mTitle.getText() + " " + mSummary.getText());
 				event.setClassName(ACCESSIBILITY_EVENT_CLASS_NAME);
-				event.setChecked(isChecked());
+				event.setChecked(getChecked());
 			}
 
 			@Override
@@ -113,7 +113,7 @@ public class CheckableMenuItem extends RelativeLayout {
 				node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
 				node.setClassName(ACCESSIBILITY_EVENT_CLASS_NAME);
 				node.setCheckable(true);
-				node.setChecked(isChecked());
+				node.setChecked(getChecked());
 
 				node.addChild(mTitle);
 				node.addChild(mSummary);
@@ -172,7 +172,7 @@ public class CheckableMenuItem extends RelativeLayout {
 		}
 	}
 
-	public boolean isChecked() {
+	public boolean getChecked() {
 		return mSwitch.isChecked();
 	}
 

@@ -4,7 +4,7 @@ ext.TRANSLATIONS_ONLY = System.getenv("TRANSLATIONS_ONLY")?.trim()
 
 if (MAVEN_REPO_CACHE) {
     pluginManagement {
-        repositories { maven { url MAVEN_REPO_CACHE } }
+        repositories { maven { url(MAVEN_REPO_CACHE) } }
     }
 }
 
@@ -21,4 +21,4 @@ buildCache {
 if (!TRANSLATIONS_ONLY) {
     include ':app'
 }
-include ':translations'
+include(":translations")

@@ -55,7 +55,7 @@
   <string name="prompt_host_disconnected">Host heeft de verbinding verbroken.\nSessie afsluiten?</string>
   <string name="prompt_continue_connecting">Weet je zeker dat je\nwilt doorgaan met verbinden?</string>
   <string name="host_authenticity_warning">De authenticatie van host \'%1$s\' kan niet worden vastgesteld.</string>
-  <string name="host_fingerprint">Host %1$s sleutel vingerafdruk is %2$s</string>
+  <string name="host_fingerprint">Host %1$s sleutel vingerafdruk is:</string>
   <string name="alert_passwords_do_not_match_msg">Wachtwoorden zijn niet hetzelfde!</string>
   <string name="alert_wrong_password_msg">Verkeerd wachtwoord!</string>
   <string name="alert_key_corrupted_msg">Privé sleutel lijkt corrupt!</string>
@@ -165,7 +165,7 @@
   <string name="disconnect_all_message">Weet je zeker dat je de verbinding wilt verbreken van alle verbonden hosts?</string>
   <string name="terminal_no_hosts_connected">Momenteel geen hosts verbonden</string>
   <string name="terminal_connecting">Bezig met verbinden naar %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Gecontroleerde host \'%1$s\' sleutel: %2$s</string>
+  <string name="terminal_success">Gecontroleerde host \'%1$s\' sleutel:</string>
   <string name="terminal_failed">Host sleutel verificatie mislukt</string>
   <string name="terminal_using_s2c_algorithm">Server-naar-cliënt algoritme: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Cliënt-naar-server algoritme: %1$s %2$s</string>

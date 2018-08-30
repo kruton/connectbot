@@ -29,4 +29,6 @@
 	<color name="accent">#40C4FF</color>
 	<color name="dark_accent">#00B0FF</color>
 
+	<color name="button_disabled">#aacccccc</color>
+	<color name="button_enabled">#ffffffff</color>
 </resources>

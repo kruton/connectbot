@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">Host has disconnected.\nClose session?</string>
   <string name="prompt_continue_connecting">Are you sure you want\nto continue connecting?</string>
   <string name="host_authenticity_warning">The authenticity of host \'%1$s\' can\'t be established.</string>
-  <string name="host_fingerprint">Host %1$s key fingerprint is %2$s</string>
+  <string name="host_fingerprint">Host %1$s key fingerprint is:</string>
   <string name="alert_passwords_do_not_match_msg">Passwords do not match!</string>
   <string name="alert_wrong_password_msg">Wrong password!</string>
   <string name="alert_key_corrupted_msg">Private key appears corrupt!</string>
@@ -205,7 +205,7 @@
   <string name="disconnect_all_neg">Cancel</string>
   <string name="terminal_no_hosts_connected">No hosts currently connected</string>
   <string name="terminal_connecting">Connecting to %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Verified host \'%1$s\' key: %2$s</string>
+  <string name="terminal_success">Verified host \'%1$s\' key:</string>
   <string name="terminal_failed">Host key verification failed.</string>
   <string name="terminal_using_s2c_algorithm">Server-to-client algorithm: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Client-to-server algorithm: %1$s %2$s</string>

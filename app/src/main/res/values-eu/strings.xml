@@ -53,7 +53,7 @@
   <string name="prompt_host_disconnected">Ostalaria deskonektatu egin da.\nSaioa itxi nahi duzu?</string>
   <string name="prompt_continue_connecting">Ziur zaude konektatzen\njarraitu nahi duzula?</string>
   <string name="host_authenticity_warning">\'%1$s\' ostalariaren autentifikazioa ezin da ziurtatu.</string>
-  <string name="host_fingerprint">%1$s ostalariaren hatz-marka %2$s da</string>
+  <string name="host_fingerprint">%1$s ostalariaren hatz-marka da:</string>
   <string name="alert_passwords_do_not_match_msg">Pasahitzak ez datoz bat!</string>
   <string name="alert_wrong_password_msg">Pasahitz okerra!</string>
   <string name="alert_key_corrupted_msg">Gako pribatua hondatuta dagoela dirudi!</string>
@@ -170,7 +170,7 @@
   <string name="disconnect_all_neg">Utzi</string>
   <string name="terminal_no_hosts_connected">Ez dago ostalaririk konektatuta une honetan</string>
   <string name="terminal_connecting">%1$s:%2$d-ra konektatzen %3$s bidez</string>
-  <string name="terminal_sucess">Egiaztatutako ostalaria \'%1$s\' gakoa: %2$s</string>
+  <string name="terminal_success">Egiaztatutako ostalaria \'%1$s\' gakoa:</string>
   <string name="terminal_failed">Ostalariaren gakoaren egiaztapenak huts egin du</string>
   <string name="terminal_using_s2c_algorithm">Zerbitzari-bezero algoritmoa: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Bezero-zerbitzari algoritmoa: %1$s %2$s</string>

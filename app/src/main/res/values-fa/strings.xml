@@ -68,7 +68,7 @@
   <string name="prompt_host_disconnected">اتصال میزبان قطع شد.\nسیژن را ببندم؟</string>
   <string name="prompt_continue_connecting">مطمئن هستید که میخواهید\nبه برقراری اتصال، ادامه دهید؟</string>
   <string name="host_authenticity_warning">میزبان \'%1$s\' نمیتواند احراز هویت شود.</string>
-  <string name="host_fingerprint">"%2$s کلید اثرانگشت میزبان  %1$s  می باشد"</string>
+  <string name="host_fingerprint">":کلید اثرانگشت میزبان  %1$s  می باشد"</string>
   <string name="alert_passwords_do_not_match_msg">گذرواژه همسان نیست!</string>
   <string name="alert_wrong_password_msg">گذرواژه اشتباه است!</string>
   <string name="alert_key_corrupted_msg">به نظر میرسد که تاریخ، کلید خصوصی، به سر رسیده است!</string>

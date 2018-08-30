@@ -1,6 +1,7 @@
 package org.connectbot;
 
-import org.connectbot.util.HostDatabase;
+//import org.connectbot.util.HostDatabase;
+
 import org.connectbot.util.PreferenceConstants;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -14,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.view.View;
 import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 import androidx.test.core.app.ApplicationProvider;
@@ -23,7 +25,6 @@ import androidx.test.espresso.action.CloseKeyboardAction;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
-import android.view.View;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
@@ -60,13 +61,13 @@ public class StartupTest {
 	private static final long KEYBOARD_DISMISSAL_DELAY_MILLIS = 1000L;
 
 	@Rule
-	public final ActivityTestRule<HostListActivity> mActivityRule = new ActivityTestRule<>(
-			HostListActivity.class, false, false);
+	public final ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
+			MainActivity.class, false, false);
 
 	@Before
 	public void makeDatabasePristine() {
 		Context testContext = ApplicationProvider.getApplicationContext();
-		HostDatabase.resetInMemoryInstance(testContext);
+//		HostDatabase.resetInMemoryInstance(testContext);
 
 		mActivityRule.launchActivity(new Intent());
 	}
@@ -167,7 +168,7 @@ public class StartupTest {
 	}
 
 	/**
-	 * Changes the color of {@code hostName} from the {@link HostListActivity} to the {@code color}
+	 * Changes the color of {@code hostName} from the hosts list to the {@code color}
 	 * from {@code R.color.[color]} with identifying {@code stringForColor} from
 	 * {@code R.string.[colorname]}.
 	 */

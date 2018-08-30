@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">ホスト切断されました．\nセッションを閉じますか？</string>
   <string name="prompt_continue_connecting">このまま接続しますか?</string>
   <string name="host_authenticity_warning">ホスト \'%1$s\' の確認ができませんでした。</string>
-  <string name="host_fingerprint">ホストの%1$sキーフィンガープリントは%2$s</string>
+  <string name="host_fingerprint">ホストの%1$sキーフィンガープリントは：</string>
   <string name="alert_passwords_do_not_match_msg">パスワードが一致しません！</string>
   <string name="alert_wrong_password_msg">間違ったパスワードです．</string>
   <string name="alert_key_corrupted_msg">秘密鍵が壊れています!</string>
@@ -204,11 +204,11 @@
   <string name="disconnect_all_neg">キャンセル</string>
   <string name="terminal_no_hosts_connected">接続済みのホストはありません．</string>
   <string name="terminal_connecting">%1$s:%2$dに%3$sで接続しています</string>
-  <string name="terminal_sucess">ホスト\'%1$s\' キー%2$s を検証しました</string>
+  <string name="terminal_success">ホスト\'%1$s\' キーを検証しました</string>
   <string name="terminal_failed">ホストキーが検証できません</string>
-  <string name="terminal_using_s2c_algorithm">サーバtoクライアント アルゴリズム: %1$s %2$s</string>
-  <string name="terminal_using_c2s_algorithm">クライアントからサーバ アルゴリズム: %1$s %2$s</string>
-  <string name="terminal_using_algorithm">使用アルゴリズム: %1$s %2$s</string>
+  <string name="terminal_using_s2c_algorithm">サーバtoクライアント アルゴリズム：%1$s %2$s</string>
+  <string name="terminal_using_c2s_algorithm">クライアントからサーバ アルゴリズム：%1$s %2$s</string>
+  <string name="terminal_using_algorithm">使用アルゴリズム： %1$s %2$s</string>
   <string name="terminal_kex_algorithm">鍵交換アルゴリズム： %s</string>
   <string name="terminal_auth">認証を試行中</string>
   <string name="terminal_auth_pass">\'password\' 認証を試行</string>

@@ -26,7 +26,6 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
 import org.apache.harmony.niochar.charset.additional.IBM437;
-import org.connectbot.transport.AbsTransport;
 
 import android.text.AndroidCharacter;
 import android.util.Log;

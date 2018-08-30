@@ -184,7 +184,7 @@
 		</TableRow>
 
 		<CheckBox
-			android:id="@+id/unlock_at_startup"
+			android:id="@+id/load_key_on_start"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/pubkey_load_on_start"/>

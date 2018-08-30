@@ -54,7 +54,7 @@
   <string name="prompt_host_disconnected">Anasistem bağlantısı kesildi.\nOturumu kapat?</string>
   <string name="prompt_continue_connecting">Bağlanmaya devam etmek\nistediğinize emin misiniz?</string>
   <string name="host_authenticity_warning">Anasistem \'%1$s\' in gerçekliği doğrulanamadı.</string>
-  <string name="host_fingerprint">Anasistem %1$s anahtar parmakizi %2$s</string>
+  <string name="host_fingerprint">Anasistem %1$s anahtar parmakizi:</string>
   <string name="alert_passwords_do_not_match_msg">Parolalar uyuşmuyor!</string>
   <string name="alert_wrong_password_msg">Yanlış parola!</string>
   <string name="alert_key_corrupted_msg">Kişisel anahtar bozuk görünüyor</string>
@@ -163,7 +163,7 @@
   <string name="delete_neg">İptal Et</string>
   <string name="terminal_no_hosts_connected">Hiçbir sunucuya bağlanılmadı</string>
   <string name="terminal_connecting">%3$s ile %1$s:%2$d bağlanıyor</string>
-  <string name="terminal_sucess">Host doğrulaması \'%1$s\' anahtar: %2$s</string>
+  <string name="terminal_success">Host doğrulaması \'%1$s\' anahtar:</string>
   <string name="terminal_failed">Sunucu anahtarı doğrulaması başarısız oldu</string>
   <string name="terminal_using_s2c_algorithm">Server-to-client s2c algoritması: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Client-to-server c2s algoritması: %1$s %2$s</string>

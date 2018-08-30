@@ -30,10 +30,12 @@
 	<string name="title_hosts_list">"Hosts"</string>
 	<!-- Window title for the Pubkeys List -->
 	<string name="title_pubkey_list">"Pubkeys"</string>
+	<!-- Window title shown when editing a port forward. -->
+	<string name="title_port_forward_edit">Edit port forward</string>
 	<!-- Window title for the Port Forwards List -->
 	<string name="title_port_forwards_list">"Port forwards"</string>
 	<!-- Window title when editing host details -->
-	<string name="title_host_editor">"Edit Host"</string>
+	<string name="title_host_editor">"Edit host"</string>
 	<!-- Window title for Help index -->
 	<string name="title_help">"Help"</string>
 	<!-- Window title for color list editing screen -->
@@ -41,9 +43,12 @@
 	<!-- Dialog title for color picker dialog -->
 	<string name="title_color_picker">"Pick a color"</string>
 	<!-- Window title for the global applications settings activity. -->
-	<string name="title_settings">Settings</string>
+	<string name="title_settings">"Settings"</string>
 	<!-- Window title when generating a new pubkey. -->
-	<string name="title_pubkey_generate">Generate</string>
+	<string name="title_pubkey_generate">"Generate"</string>
+	<!-- Window title displayed when showing a terminal view that shows the SSH connection input
+	     and output. -->
+	<string name="title_console">"Console"</string>
 
 	<string name="help_intro">"Please select a topic below for more information on a particular subject."</string>
 
@@ -131,13 +136,30 @@
 	<!-- Pubkey preference asking user whether the key use should be confirmed via prompt before it can be used for authentication -->
 	<string name="pubkey_confirm_use">"Confirm before use"</string>
 
-	<!-- When the list of port forwards for a host is empty, this text is is shown in the space where the list of port forwards are normally present. Note that the '\n' splits lines, so it's actually "create port forwards" -->
-	<string name="portforward_list_empty">"Tap \"Menu\" to create"\n"port forwards."</string>
+	<!-- When the list of port forwards for a host is empty, this text is is shown in the space where the list of port forwards are normally present.  -->
+	<string name="portforward_list_empty">"No port forwards created yet."</string>
 	<!-- Context menu action where a user can edite the selected port forward for the host. -->
 	<string name="portforward_edit">"Edit port forward"</string>
 	<!-- Context menu action where a user can delete the selected port forward from the host. -->
 	<string name="portforward_delete">"Delete port forward"</string>
 
+	<!-- Description of the action to create a new port forward for accessibility purposes (e.g.,
+	 a screen reader will read this text. -->
+	<string name="portforward_add_new">Create new port forward</string>
+	<!-- Label for button to save a port forward. This is shown in the action bar on the top of the
+	     screen when editing or adding a port forward. -->
+	<string name="portforward_save">Save</string>
+	<!-- Error label displayed for the "source port" field of a port forward creating or editing
+	     was not entered. -->
+	<string name="portforward_error_no_source_port">Source port required.</string>
+	<!-- Error message displayed when the destination for a port forward was not entered, but
+	     is required. -->
+	<string name="portforward_error_no_destination">Destination is needed.</string>
+	<!-- Error message displayed when the destination for a port forward was entered, but its
+	     format is incorrect. -->
+	<string name="portforward_error_invalid_destination">Destination is invalid.</string>
+
+	<!-- Prompt given to user for a text field where the nickname of an entry is needed. -->
 	<string name="prompt_nickname">"Nickname:"</string>
 	<!-- An example string that could be used as a nickname for a pubkey. -->
 	<string name="prompt_nickname_hint_pubkey">"My work key"</string>
@@ -153,6 +175,11 @@
 	<string name="prompt_again">"(again)"</string>
 	<!-- Label for the user to select port forward type. -->
 	<string name="prompt_type">"Type:"</string>
+	<!-- The "elliptic curve group" (EC group) in which this key resides. This is related
+	     to cryptography and the parameters for creating a private key for use in cryptography.
+	     This prompt is displayed at the prompt where a user is expected to select an EC
+	     group to create a new key. -->
+	<string name="prompt_ec_group">EC group:</string>
 	<!-- Hint given below the password input box that lets them know that they are allowed to leave the field blank. -->
 	<string name="prompt_password_can_be_blank">"Note: password can be blank"</string>
 	<!-- Prompt for the size of the private key in bits. -->
@@ -177,7 +204,7 @@
 	<!-- Sent to user when the remote public encryption key fingerprint doesn't match the local database -->
 	<string name="host_authenticity_warning">"The authenticity of host '%1$s' can't be established."</string>
 	<!-- First field is encryption algorithm. Second is the actual fingerprint in hex digits -->
-	<string name="host_fingerprint">"Host %1$s key fingerprint is %2$s"</string>
+	<string name="host_fingerprint">"Host %1$s key fingerprint is:"</string>
 
 	<string name="alert_passwords_do_not_match_msg">"Passwords do not match!"</string>
 	<string name="alert_wrong_password_msg">"Wrong password!"</string>
@@ -482,7 +509,7 @@
 	<string name="terminal_connecting" tools:ignore="PluralsCandidate">"Connecting to %1$s:%2$d via %3$s"</string>
 
 	<!-- Displays the host key to the user in the terminal -->
-	<string name="terminal_sucess">"Verified host '%1$s' key: %2$s"</string>
+	<string name="terminal_success">"Verified host '%1$s' key:"</string>
 	<string name="terminal_failed">"Host key verification failed."</string>
 
 	<!-- Displayed on the terminal describing the cryptographic algorithm names -->
@@ -643,6 +670,15 @@
 	<string name="pubkey_add_new">Add new pubkey</string>
 	<!-- Text for button which, when clicked, brings up picker to import an existing pubkey. -->
 	<string name="pubkey_import_existing">Import existing pubkey</string>
+	<!-- Displayed as warning message to user when the cryptographic key strength they are choosing
+	     is too weak for current standards. This is displayed to users as they when they choose a
+	     key strength that is not the default in the "key generation" screen. -->
+	<string name="pubkey_strength_warning">Key strength is below recommended level.</string>
+	<!-- Displayed as a warning message to users when the cryptographic key strength they are
+	     choosing is so strong that any operation involving the key will take a long time to
+	     complete. This is displayed to users when they choose a key strength that is not the
+	     default in the "key generation" screen. -->
+	<string name="pubkey_performance_warning">Key strength too high; performance will suffer.</string>
 	<!-- Text for dialog which explains that the host URI is invalid and asks to discard. -->
 	<string name="discard_host_changes_message">Host URI is invalid. Would you like to discard changes?</string>
 	<!-- Text for button which discards changes to the host. -->
@@ -673,4 +709,11 @@
 	     Added to the end of a key description to indicate that the key is encrypted (i.e,
 	     password protected). -->
 	<string name="key_attribute_encrypted">(encrypted)</string>
+
+	<!-- Title shown for the activity where you import an existing pubkey to the program. -->
+	<string name="title_pubkey_import">Import pubkey</string>
+
+	<!-- Displayed on the button which when pressed will save changes made to a pubkey in
+	     the current editing session. -->
+	<string name="pubkey_save">Save</string>
 </resources>

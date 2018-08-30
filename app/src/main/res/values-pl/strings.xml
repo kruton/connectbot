@@ -62,7 +62,7 @@
   <string name="prompt_host_disconnected">Host rozłączył się.\nZamknąć sesję?</string>
   <string name="prompt_continue_connecting">Czy na pewno chcesz\nkontynuować połączenie?</string>
   <string name="host_authenticity_warning">Autentyczność hostu \'%1$s\' nie może zostać ustalona.</string>
-  <string name="host_fingerprint">Odcisk hostu %1$s to %2$s</string>
+  <string name="host_fingerprint">Odcisk hostu %1$s to:</string>
   <string name="alert_passwords_do_not_match_msg">Hasła nie zgadzają się!</string>
   <string name="alert_wrong_password_msg">Nieprawidłowe hasło!</string>
   <string name="alert_key_corrupted_msg">Klucz prywatny wydaje się być uszkodzony!</string>
@@ -183,7 +183,7 @@
   <string name="disconnect_all_neg">Anuluj</string>
   <string name="terminal_no_hosts_connected">Żaden host nie jest obecnie połączony</string>
   <string name="terminal_connecting">Łączenie z hostem %1$s:%2$d przez %3$s</string>
-  <string name="terminal_sucess">Host \'%1$s \' zweryfikowany kluczem: %2$s</string>
+  <string name="terminal_success">Host \'%1$s \' zweryfikowany kluczem:</string>
   <string name="terminal_failed">Weryfikacja klucza dla hostu nie powiodła się.</string>
   <string name="terminal_using_s2c_algorithm">Algorytm serwer-klient: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algorytm klient-serwer: %1$s %2$s</string>

@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">Host desconectado.\nFechar sessão?</string>
   <string name="prompt_continue_connecting">Você tem certeza que\ndeseja se conectar?</string>
   <string name="host_authenticity_warning">A autenticidade do Host \'%1$s\' não pode ser estabelecida</string>
-  <string name="host_fingerprint">O host %1$s tem a impressão digital %2$s</string>
+  <string name="host_fingerprint">O host %1$s tem a impressão digital:</string>
   <string name="alert_passwords_do_not_match_msg">As senhas são diferentes!</string>
   <string name="alert_wrong_password_msg">Senha incorreta!</string>
   <string name="alert_key_corrupted_msg">A chave privada parece estar corrompida!</string>
@@ -205,7 +205,7 @@
   <string name="disconnect_all_neg">Cancelar</string>
   <string name="terminal_no_hosts_connected">Sem host conectado atualmente</string>
   <string name="terminal_connecting">Conectando no %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">"Anfitrião comprovado  \'%1$s\' chave: %2$s"</string>
+  <string name="terminal_success">"Anfitrião comprovado  \'%1$s\' chave:"</string>
   <string name="terminal_failed">Falha na verificação da chave do host</string>
   <string name="terminal_using_s2c_algorithm">Algoritmo do servidor para o cliente: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritmo do cliente para o servidor: %1$s %2$s</string>

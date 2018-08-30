@@ -62,7 +62,7 @@
   <string name="prompt_host_disconnected">Gostitelj je prekinil povezavo.\nZaprem sejo?</string>
   <string name="prompt_continue_connecting">Ali ste prepričani, da želite\nnadaljevati s povezovanjem?</string>
   <string name="host_authenticity_warning">Istovetnost gostitelja \'%1$s\' ni mogoče ugotoviti.</string>
-  <string name="host_fingerprint">Ključ gostitelja %1$s ima zgoščeno vrednost %2$s</string>
+  <string name="host_fingerprint">Ključ gostitelja %1$s ima zgoščeno vrednost:</string>
   <string name="alert_passwords_do_not_match_msg">Gesla se ne ujemajo!</string>
   <string name="alert_wrong_password_msg">Napačno geslo!</string>
   <string name="alert_key_corrupted_msg">Zasebni ključ izgleda pokvarjen!</string>
@@ -161,7 +161,7 @@
   <string name="disconnect_all_neg">Prekliči</string>
   <string name="terminal_no_hosts_connected">Trenutno ni noben gostitelj povezan</string>
   <string name="terminal_connecting">Povezujem se na %1$s:%2$d preko %3$s</string>
-  <string name="terminal_sucess">Preverjen gostitelj \'%1$s\' ključ: %2$s</string>
+  <string name="terminal_success">Preverjen gostitelj \'%1$s\' ključ:</string>
   <string name="terminal_failed">Preverjanje ključa gostitelja spodletelo.</string>
   <string name="terminal_using_s2c_algorithm">Strežnik - odjemalec algoritem: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Odjemalec - strežnik algoritem: %1$s %2$s</string>

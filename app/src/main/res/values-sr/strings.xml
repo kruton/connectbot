@@ -49,7 +49,7 @@
   <string name="prompt_host_disconnected">Домаћин је прекинуо везу.\nДа затворим сесију?</string>
   <string name="prompt_continue_connecting">Желите ли заиста да\nнаставите повезивање?</string>
   <string name="host_authenticity_warning">Не могу да утврдим аутентичност домаћина „%1$s“.</string>
-  <string name="host_fingerprint">Отисак домаћина %1$s је %2$s</string>
+  <string name="host_fingerprint">Отисак домаћина %1$s је:</string>
   <string name="alert_passwords_do_not_match_msg">Лозинке се поклапају!</string>
   <string name="alert_wrong_password_msg">Погрешна лозинка!</string>
   <string name="alert_key_corrupted_msg">Изгледа да је приватни кључ покварен!</string>
@@ -172,7 +172,7 @@
   <string name="delete_neg">Одустани</string>
   <string name="terminal_no_hosts_connected">Нема повезаних домаћина тренутно</string>
   <string name="terminal_connecting">Повезујем се са %1$s:%2$d преко %3$s</string>
-  <string name="terminal_sucess">Verified host \'%1$s\' key: %2$s</string>
+  <string name="terminal_success">Verified host \'%1$s\' key:</string>
   <string name="terminal_failed">Host key verification failed.</string>
   <string name="terminal_using_s2c_algorithm">Сервер-клијент алгоритам: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Клијент-сервер алгоритам: %1$s %2$s</string>

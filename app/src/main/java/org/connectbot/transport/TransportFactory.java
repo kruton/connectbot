@@ -17,75 +17,173 @@
 
 package org.connectbot.transport;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.connectbot.bean.HostBean;
-import org.connectbot.data.HostStorage;
+import org.connectbot.R;
+import org.connectbot.db.entity.Host;
+import org.connectbot.ui.common.IResourceProvider;
+import org.jetbrains.annotations.Contract;
 
-import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import timber.log.Timber;
+
+/**/
 
 
 /**
  * @author Kenny Root
- *
  */
 public class TransportFactory {
-	private static final String TAG = "CB.TransportFactory";
+	private static final Pattern SSH_HOSTMASK = Pattern.compile(
+		"^(.+)@([0-9a-z.-]+|\\[[a-f:0-9]+])(:(\\d+))?$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern TELNET_HOSTMASK = Pattern.compile(
+
+		"^([0-9a-z.-]+)(:(\\d+))?$", Pattern.CASE_INSENSITIVE);
 
 	private static String[] transportNames = {
-		SSH.getProtocolName(),
-		Telnet.getProtocolName(),
-		Local.getProtocolName(),
+		"ssh",
+		"telnet",
+		"local",
 	};
 
-	/**
-	 * @param protocol
-	 * @return
-	 */
-	public static AbsTransport getTransport(String protocol) {
-		if (SSH.getProtocolName().equals(protocol)) {
-			return new SSH();
-		} else if (Telnet.getProtocolName().equals(protocol)) {
-			return new Telnet();
-		} else if (Local.getProtocolName().equals(protocol)) {
-			return new Local();
+	public static Host createHost(String scheme, String input) {
+		Timber.d("Attempting to discover URI for scheme=%s on input=%s", scheme, input);
+		if ("ssh".equals(scheme)) {
+			return createSshHost(input);
+		} else if ("telnet".equals(scheme))
+			return createTelnetHost(input);
+		else if ("local".equals(scheme)) {
+			return createLocalHost(input);
 		} else {
 			return null;
 		}
 	}
 
-	public static Uri getUri(String scheme, String input) {
-		Log.d("TransportFactory", String.format(
-				"Attempting to discover URI for scheme=%s on input=%s", scheme,
-				input));
-		if (SSH.getProtocolName().equals(scheme))
-			return SSH.getUri(input);
-		else if (Telnet.getProtocolName().equals(scheme))
-			return Telnet.getUri(input);
-		else if (Local.getProtocolName().equals(scheme)) {
-			Log.d("TransportFactory", "Got to the local parsing area");
-			return Local.getUri(input);
-		} else
-			return null;
+	private static Host createLocalHost(String input) {
+		Uri uri = getLocalUri(input);
+
+		Host host = new Host();
+
+		host.setProtocol("local");
+
+		String nickname = uri.getFragment();
+		if (nickname == null || nickname.length() == 0) {
+			host.setNickname("Local");
+		} else {
+			host.setNickname(uri.getFragment());
+		}
+
+		return host;
 	}
 
+	private static Uri getTelnetUri(String input) {
+		Matcher matcher = TELNET_HOSTMASK.matcher(input);
+
+		if (!matcher.matches())
+			return null;
+
+		try {
+			return getTelnetUri(matcher.group(1), Integer.valueOf(matcher.group(3)));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	private static Host createTelnetHost(String input) {
+		Uri uri = getTelnetUri(input);
+
+		Host host = new Host();
+
+		host.setProtocol("telnet");
+
+		host.setHostname(uri.getHost());
+
+		int port = uri.getPort();
+		if (port < 0 || port > 65535)
+			port = 23;
+		host.setPort(port);
+
+		String nickname = uri.getFragment();
+		if (nickname == null || nickname.length() == 0) {
+			host.setNickname(getDefaultTelnetNickname(host.getHostname(), port));
+		} else {
+			host.setNickname(uri.getFragment());
+		}
+
+		return host;
+	}
+
+	private static String getDefaultTelnetNickname(String hostname, int port) {
+		if (port == 23) {
+			return String.format(Locale.US, "%s", hostname);
+		} else {
+			return String.format(Locale.US, "%s:%d", hostname, port);
+		}
+	}
+
+	private static Host createSshHost(String input) {
+		Uri uri = getSshUri(input);
+
+		Host host = new Host();
+
+		host.setProtocol("ssh");
+
+		host.setHostname(uri.getHost());
+
+		int port = uri.getPort();
+		if (port < 0 || port > 65535)
+			port = 22;
+		host.setPort(port);
+
+		host.setUsername(uri.getUserInfo());
+
+		String nickname = uri.getFragment();
+		if (nickname == null || nickname.length() == 0) {
+			host.setNickname(getDefaultSshNickname(host.getUsername(),
+				host.getHostname(), port));
+		} else {
+			host.setNickname(uri.getFragment());
+		}
+
+		return host;
+	}
+
+	private static Uri getSshUri(String input) {
+		Matcher matcher = SSH_HOSTMASK.matcher(input);
+		if (!matcher.matches())
+			return null;
+
+		int port;
+		try {
+			port = Integer.valueOf(matcher.group(4));
+		} catch (NumberFormatException e) {
+			port = 22;
+		}
+
+		return getSshUri(matcher.group(1), matcher.group(2), port);
+
+	}
+
+	private static String getDefaultSshNickname(String username, String hostname, int port) {
+		if (port == 22) {
+			return String.format(Locale.US, "%s@%s", username, hostname);
+		} else {
+			return String.format(Locale.US, "%s@%s:%d", username, hostname, port);
+		}
+	}
+
+	@Contract(pure = true)
 	public static String[] getTransportNames() {
 		return transportNames;
 	}
 
-	public static boolean isSameTransportType(AbsTransport a, AbsTransport b) {
-		if (a == null || b == null)
-			return false;
-
-		return a.getClass().equals(b.getClass());
-	}
-
 	public static boolean canForwardPorts(String protocol) {
 		// TODO uh, make this have less knowledge about its children
-		return SSH.getProtocolName().equals(protocol);
+		return "ssh".equals(protocol);
 	}
 
 	/**
@@ -93,35 +191,129 @@ public class TransportFactory {
 	 * @param context
 	 * @return expanded format hint
 	 */
-	public static String getFormatHint(String protocol, Context context) {
-		if (SSH.getProtocolName().equals(protocol)) {
-			return SSH.getFormatHint(context);
-		} else if (Telnet.getProtocolName().equals(protocol)) {
-			return Telnet.getFormatHint(context);
-		} else if (Local.getProtocolName().equals(protocol)) {
-			return Local.getFormatHint(context);
+	@NonNull
+	public static String getFormatHint(String protocol, IResourceProvider context) {
+		if ("ssh".equals(protocol)) {
+			return getSshFormatHint(context);
+		} else if ("telnet".equals(protocol)) {
+			return getTelnetFormatHint(context);
+		} else if ("local".equals(protocol)) {
+			return getLocalFormatHint(context);
 		} else {
-			return AbsTransport.getFormatHint(context);
+			return "";
 		}
 	}
 
-	/**
-	 * @param hostdb Handle to HostDatabase
-	 * @param uri URI to target server
-	 * @return true when host was found
-	 */
-	public static HostBean findHost(HostStorage hostdb, Uri uri) {
-		AbsTransport transport = getTransport(uri.getScheme());
+	private static String getLocalFormatHint(IResourceProvider context) {
+		return context.getString(R.string.hostpref_nickname_title);
+	}
 
-		Map<String, String> selection = new HashMap<>();
+	private static String getTelnetFormatHint(IResourceProvider context) {
+		return String.format("%s:%s",
+			context.getString(R.string.format_hostname),
+			context.getString(R.string.format_port));
+	}
 
-		transport.getSelectionArgs(uri, selection);
-		if (selection.isEmpty()) {
-			Log.e(TAG, String.format("Transport %s failed to do something useful with URI=%s",
-					uri.getScheme(), uri.toString()));
-			throw new IllegalStateException("Failed to get needed selection arguments");
+	private static String getSshFormatHint(IResourceProvider context) {
+		return String.format("%s@%s:%s",
+			context.getString(R.string.format_username),
+			context.getString(R.string.format_hostname),
+			context.getString(R.string.format_port));
+	}
+
+	@Nullable
+	public static Uri getUriForHost(Host host) {
+		switch (host.getProtocol()) {
+		case "ssh":
+			return getSshUri(host.getUsername(), host.getHostname(), host.getPort());
+		case "telnet":
+			return getTelnetUri(host.getHostname(), host.getPort());
+		case "local":
+			return getLocalUri(host.getNickname());
+		default:
+			return null;
+		}
+	}
+
+	private static Uri getLocalUri(String nickname) {
+		Uri uri = Uri.parse("local:#Local");
+
+		if (nickname != null && nickname.length() > 0) {
+			uri = uri.buildUpon().fragment(nickname).build();
 		}
 
-		return hostdb.findHost(selection);
+		return uri;
+	}
+
+	private static Uri getTelnetUri(String hostname, int port) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(hostname);
+
+		if (port != 23) {
+			sb.append(':');
+			sb.append(port);
+		}
+
+		String hostPort = sb.toString();
+
+		sb.setLength(0);
+		sb.append("telnet")
+			.append("://")
+			.append(hostPort)
+			.append("/#")
+			.append(Uri.encode(hostPort));
+
+		return Uri.parse(sb.toString());
+	}
+
+	private static Uri getSshUri(String username, String hostname, int port) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(Uri.encode(username))
+			.append('@')
+			.append(Uri.encode(hostname));
+
+		if (port != 22) {
+			sb.append(':')
+				.append(port);
+		}
+
+		String userHostPort = sb.toString();
+
+		sb.setLength(0);
+		sb.append("ssh")
+			.append("://")
+			.append(userHostPort)
+			.append("/#")
+			.append(Uri.encode(userHostPort));
+
+		return Uri.parse(sb.toString());
+	}
+
+	@NonNull
+	public static String hostToString(Host host) {
+		if ("ssh".equals(host.getProtocol())) {
+			if (host.getUsername() == null || host.getHostname() == null ||
+				host.getUsername().equals("") || host.getHostname().equals(""))
+				return "";
+
+			if (host.getPort() == 22)
+				return host.getUsername() + "@" + host.getHostname();
+			else
+				return host.getUsername() + "@" + host.getHostname() + ":" + host.getPort();
+		} else if ("telnet".equals(host.getProtocol())) {
+			if (host.getHostname() == null || host.getHostname().equals(""))
+				return "";
+			else if (host.getPort() == 23)
+				return host.getHostname();
+			else
+				return host.getHostname() + ":" + host.getPort();
+		} else if ("local".equals(host.getProtocol())) {
+			return host.getNickname();
+		}
+
+		// Fail gracefully.
+		return "";
 	}
 }

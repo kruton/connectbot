@@ -21,8 +21,8 @@ import org.connectbot.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.preference.DialogPreference;
 import android.util.AttributeSet;
+import androidx.preference.DialogPreference;
 
 /**
  * @author Kenny Root

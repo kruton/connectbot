@@ -49,7 +49,7 @@
   <string name="prompt_host_disconnected">המארח התנתק.\nלסגור את החלון?</string>
   <string name="prompt_continue_connecting">האם אכן\nלהמשיך בהליך החיבור?</string>
   <string name="host_authenticity_warning">לא ניתן לאמת את אותנטיות המארח\'%1$s\'.</string>
-  <string name="host_fingerprint">טביעת האצבע של המפתח שלהמארח %1$s היא %2$s</string>
+  <string name="host_fingerprint">טביעת האצבע של המפתח שלהמארח %1$s היא:</string>
   <string name="alert_passwords_do_not_match_msg">הססמאות אינן תואמות!</string>
   <string name="alert_wrong_password_msg">ססמה שגויה!</string>
   <string name="alert_key_corrupted_msg">המפתח הפרטי נראה פגום!</string>
@@ -159,7 +159,7 @@
   <string name="delete_neg">ביטול</string>
   <string name="terminal_no_hosts_connected">אין מארחים מחוברים כרגע</string>
   <string name="terminal_connecting">מתבצעת התחברות אל %1$s:%2$d דרך %3$s</string>
-  <string name="terminal_sucess">מפתח של המארח המאומת \'%1$s\'‏: %2$s</string>
+  <string name="terminal_success">מפתח של המארח המאומת \'%1$s\'‏:</string>
   <string name="terminal_failed">אימות מפתח המארח נכשל.</string>
   <string name="terminal_using_s2c_algorithm">אלגוריתם שרת ללקוח: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">אלגוריתם לקוח לשרת: %1$s %2$s</string>

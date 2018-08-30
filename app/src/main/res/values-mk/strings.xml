@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">Хостот се дисконектираше.\nЗатвори ја сесијата?</string>
   <string name="prompt_continue_connecting">Дали си сигурен дека\nсакаш да продолжиш со поврзување?</string>
   <string name="host_authenticity_warning">Автентичноста на \'%1$s\' не може да биде потврдена.</string>
-  <string name="host_fingerprint">Отпечаток на клучот на хостот %1$s е %2$s</string>
+  <string name="host_fingerprint">Отпечаток на клучот на хостот %1$s е:</string>
   <string name="alert_passwords_do_not_match_msg">Лозинките не се совпаѓаат!</string>
   <string name="alert_wrong_password_msg">Погрешна лозинка!</string>
   <string name="alert_key_corrupted_msg">Приватниот клуч е корумпиран!</string>

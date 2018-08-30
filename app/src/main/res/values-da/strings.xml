@@ -48,7 +48,7 @@
   <string name="prompt_host_disconnected">Værten har afbrudt forbindelsen.\nLuk session?</string>
   <string name="prompt_continue_connecting">Er du sikker på at du ønsker\nat skabe forbindelse?</string>
   <string name="host_authenticity_warning">Ægtheden for værten \'%1$s\' kan ikke påvises.</string>
-  <string name="host_fingerprint">%1$s nøgle fingeraftryk er %2$s</string>
+  <string name="host_fingerprint">%1$s nøgle fingeraftryk er:</string>
   <string name="alert_passwords_do_not_match_msg">Adgangskoderne er ikke ens!</string>
   <string name="alert_wrong_password_msg">Forkert adgangskode!</string>
   <string name="alert_key_corrupted_msg">Privat nøgle synes ødelagt!</string>
@@ -156,7 +156,7 @@
   <string name="delete_neg">Afbryd</string>
   <string name="terminal_no_hosts_connected">Ingen forbindelser aktive i øjeblikket</string>
   <string name="terminal_connecting">Forbinder til %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Verificeret vært \'%1$s\' nøgle: %2$s</string>
+  <string name="terminal_success">Verificeret vært \'%1$s\' nøgle:</string>
   <string name="terminal_failed">Verifikation af værtsnøgle mislykkedes.</string>
   <string name="terminal_using_s2c_algorithm">Server-til-klient algoritme: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Klient-til-server algoritme: %1$s %2$s</string>

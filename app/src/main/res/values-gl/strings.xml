@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">O equipo desconectouse.\n¿Pechar a sesión?</string>
   <string name="prompt_continue_connecting">Seguro que quere\ncontinuar conectándose?</string>
   <string name="host_authenticity_warning">A autenticidade do servidor \'%1$s\' non pode ser establecida</string>
-  <string name="host_fingerprint">O servidor %1$s ten a pegada dixital %2$s</string>
+  <string name="host_fingerprint">O servidor %1$s ten a pegada dixital:</string>
   <string name="alert_passwords_do_not_match_msg">¡Non coinciden os contrasinais!</string>
   <string name="alert_wrong_password_msg">¡Contrasinal incorrecto!</string>
   <string name="alert_key_corrupted_msg">¡A chave privada parece corrupta!</string>
@@ -204,7 +204,7 @@
   <string name="disconnect_all_neg">Cancelar</string>
   <string name="terminal_no_hosts_connected">Non hai servidores actualmente conectados</string>
   <string name="terminal_connecting">Conectando a %1$s:%2$d via %3$s</string>
-  <string name="terminal_sucess">Servidor verificado \'%1$s\' chave: %2$s</string>
+  <string name="terminal_success">Servidor verificado \'%1$s\' chave:</string>
   <string name="terminal_failed">Fallou a verificación da chave do servidor</string>
   <string name="terminal_using_s2c_algorithm">Algoritmo servidor-a-cliente: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Algoritmo cliente-a-servidor: %1$s %2$s</string>

@@ -1,30 +1,55 @@
 package org.connectbot;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.test.espresso.NoMatchingViewException;
-import androidx.test.espresso.ViewAssertion;
-import androidx.test.espresso.matcher.BoundedMatcher;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import org.connectbot.bean.HostBean;
+import org.connectbot.databinding.ItemHostBinding;
+import org.connectbot.databinding.ItemPubkeyBinding;
+import org.connectbot.db.entity.Host;
+import org.connectbot.db.entity.Pubkey;
+import org.connectbot.ui.common.DataBoundViewHolder;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.databinding.ViewDataBinding;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.ViewAssertion;
+import androidx.test.espresso.matcher.BoundedMatcher;
+
 public class ConnectbotMatchers {
+	public abstract static class BindingMatcher<T extends ViewDataBinding> extends BoundedMatcher<RecyclerView.ViewHolder, DataBoundViewHolder> {
+		private Class<T> expectedBindingClass;
+
+		BindingMatcher(Class<T> expectedBindingClass) {
+			super(DataBoundViewHolder.class);
+			this.expectedBindingClass = expectedBindingClass;
+		}
+
+		@Override
+		public boolean matchesSafely(DataBoundViewHolder holder) {
+			ViewDataBinding binding = holder.getBinding();
+			if (binding.getClass().isAssignableFrom(expectedBindingClass)) {
+				return matchBinding((T) binding);
+			}
+			return false;
+		}
+
+		public abstract boolean matchBinding(T binding);
+	}
+
 	/**
-	 * Matches the nickname of a {@link HostBean}.
+	 * Matches the nickname of a {@link Host}.
 	 */
 	@NonNull
 	public static Matcher<RecyclerView.ViewHolder> withHostNickname(final String content) {
-		return new BoundedMatcher<RecyclerView.ViewHolder, HostListActivity.HostViewHolder>(HostListActivity.HostViewHolder.class) {
+		return new BindingMatcher<ItemHostBinding>(ItemHostBinding.class) {
 			@Override
-			public boolean matchesSafely(HostListActivity.HostViewHolder holder) {
-				return holder.host.getNickname().matches(content);
+			public boolean matchBinding(ItemHostBinding binding) {
+				return binding.getHost().getNickname().matches(content);
 			}
 
 			@Override
@@ -35,14 +60,14 @@ public class ConnectbotMatchers {
 	}
 
 	/**
-	 * Matches the nickname of a {@link org.connectbot.bean.PubkeyBean}.
+	 * Matches the nickname of a {@link Pubkey}.
 	 */
 	@NonNull
 	public static Matcher<RecyclerView.ViewHolder> withPubkeyNickname(final String content) {
-		return new BoundedMatcher<RecyclerView.ViewHolder, PubkeyListActivity.PubkeyViewHolder>(PubkeyListActivity.PubkeyViewHolder.class) {
+		return new BindingMatcher<ItemPubkeyBinding>(ItemPubkeyBinding.class) {
 			@Override
-			public boolean matchesSafely(PubkeyListActivity.PubkeyViewHolder holder) {
-				return holder.pubkey.getNickname().matches(content);
+			public boolean matchBinding(ItemPubkeyBinding binding) {
+				return binding.getPubkey().getNickname().matches(content);
 			}
 
 			@Override
@@ -51,12 +76,15 @@ public class ConnectbotMatchers {
 			}
 		};
 	}
+
 	@NonNull
 	public static Matcher<RecyclerView.ViewHolder> withConnectedHost() {
-		return new BoundedMatcher<RecyclerView.ViewHolder, HostListActivity.HostViewHolder>(HostListActivity.HostViewHolder.class) {
+		return new BindingMatcher<ItemHostBinding>(ItemHostBinding.class) {
 			@Override
-			public boolean matchesSafely(HostListActivity.HostViewHolder holder) {
-				return hasDrawableState(holder.icon, android.R.attr.state_checked);
+			public boolean matchBinding(ItemHostBinding binding) {
+				return false;
+				// TODO[kenny]: reimplement this matcher
+				// return hasDrawableState(binding.getHost().conn, android.R.attr.state_checked);
 			}
 
 			@Override
@@ -68,10 +96,12 @@ public class ConnectbotMatchers {
 
 	@NonNull
 	public static Matcher<RecyclerView.ViewHolder> withDisconnectedHost() {
-		return new BoundedMatcher<RecyclerView.ViewHolder, HostListActivity.HostViewHolder>(HostListActivity.HostViewHolder.class) {
+		return new BindingMatcher<ItemHostBinding>(ItemHostBinding.class) {
 			@Override
-			public boolean matchesSafely(HostListActivity.HostViewHolder holder) {
-				return hasDrawableState(holder.icon, android.R.attr.state_expanded);
+			public boolean matchBinding(ItemHostBinding binding) {
+				return false;
+				// TODO[kenny]: reimplement this matcher
+				// return hasDrawableState(holder.icon, android.R.attr.state_expanded);
 			}
 
 			@Override
@@ -83,10 +113,12 @@ public class ConnectbotMatchers {
 
 	@NonNull
 	public static Matcher<RecyclerView.ViewHolder> withColoredText(@ColorInt final int expectedColor) {
-		return new BoundedMatcher<RecyclerView.ViewHolder, HostListActivity.HostViewHolder>(HostListActivity.HostViewHolder.class) {
+		return new BindingMatcher<ItemHostBinding>(ItemHostBinding.class) {
 			@Override
-			public boolean matchesSafely(HostListActivity.HostViewHolder holder) {
-				return hasTextColor(holder.nickname, expectedColor);
+			public boolean matchBinding(ItemHostBinding binding) {
+				return false;
+				// TODO[kenny]: Reimplement this matcher
+				// return hasTextColor(holder.nickname, expectedColor);
 			}
 
 			@Override

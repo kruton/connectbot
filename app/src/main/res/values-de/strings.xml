@@ -73,7 +73,7 @@
   <string name="prompt_host_disconnected">Der Host hat die Verbindung beendet.\nSitzung schließen?</string>
   <string name="prompt_continue_connecting">Sind Sie sicher, dass Sie\neine Verbindung herstellen wollen?</string>
   <string name="host_authenticity_warning">Die Authentizität von Host \'%1$s\' kann nicht garantiert werden.</string>
-  <string name="host_fingerprint">Host %1$ss Schlüssel Fingerabdruck ist %2$s</string>
+  <string name="host_fingerprint">Host %1$ss Schlüssel Fingerabdruck ist:</string>
   <string name="alert_passwords_do_not_match_msg">Passwörter stimmen nicht überein!</string>
   <string name="alert_wrong_password_msg">Falsches Passwort!</string>
   <string name="alert_key_corrupted_msg">Geheimer Schlüssel scheint korrupt!</string>
@@ -205,7 +205,7 @@
   <string name="disconnect_all_neg">Abbrechen</string>
   <string name="terminal_no_hosts_connected">Zur Zeit keine Hosts verbunden</string>
   <string name="terminal_connecting">Verbinde mit %1$s:%2$d mittels %3$s</string>
-  <string name="terminal_sucess">Host \'%1$s\' Schlüssel: %2$s bestätigt</string>
+  <string name="terminal_success">Host \'%1$s\' Schlüssel: bestätigt</string>
   <string name="terminal_failed">Überprüfung des Host-Schlüssels fehlgeschlagen.</string>
   <string name="terminal_using_s2c_algorithm">Server zu Client Algorithmus: %1$s %2$s</string>
   <string name="terminal_using_c2s_algorithm">Client zu Server Algorithmus: %1$s %2$s</string>
