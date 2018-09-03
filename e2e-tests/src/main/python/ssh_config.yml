@@ -1,0 +1,5 @@
+TestBeds:
+  # ADB will find the first device
+  - Name: AnyDevice
+    Controllers:
+      AndroidDevice: '*'

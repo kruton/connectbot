@@ -99,6 +99,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     buildTypes {
         release {
             shrinkResources true
@@ -138,6 +139,28 @@ android {
         google {
             dimension "license"
             versionNameSuffix ""
+        }
+
+        // This product flavor is for Mobly test orchestration
+        snippet {
+            applicationIdSuffix ".mobly"
+        }
+    }
+
+    sourceSets {
+        snippet {
+            java.srcDirs += ['src/google/java', 'src/androidTest/java']
+        }
+        androidTestSnippet.java.srcDirs = []
+        androidTestSnippetDebug.java.srcDirs = []
+        testSnippet.java.srcDirs = []
+        testSnippetDebug.java.srcDirs = []
+    }
+
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (variant.buildType.name == "release" && names.contains("snippet")) {
+            setIgnore(true)
         }
     }
 
@@ -206,5 +229,14 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.19.0'
     testImplementation 'org.assertj:assertj-core:3.10.0'
     testImplementation 'org.robolectric:robolectric:3.6.1'
+
+    // Mobly test orchestration
+    snippetImplementation 'com.google.android.mobly:mobly-snippet-lib:1.3.0'
+    snippetImplementation 'com.android.support:support-annotations:27.1.1'
+    snippetImplementation "com.android.support.test:rules:$testRunnerVersion"
+    snippetImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+    snippetImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
+    snippetImplementation "com.android.support.test.espresso:espresso-contrib:$espressoVersion"
+    snippetImplementation 'com.google.android.gms:play-services-base:15.0.1'
 }
 
