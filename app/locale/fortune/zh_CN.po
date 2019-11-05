@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-02-28 00:29-0800\n"
-"PO-Revision-Date: 2017-03-06 04:00+0000\n"
-"Last-Translator: Wei.li <Unknown>\n"
+"PO-Revision-Date: 2019-05-06 16:23+0000\n"
+"Last-Translator: FB <Unknown>\n"
 "Language-Team: zh_Hans_CN <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2018-11-01 01:00+0000\n"
-"X-Generator: Launchpad (build 18810)\n"
+"X-Launchpad-Export-Date: 2019-05-07 05:36+0000\n"
+"X-Generator: Launchpad (build 18953)\n"
 "Language: zh_Hans_CN\n"
 "Generated-By: Babel 2.3.4\n"
 
@@ -30,7 +30,7 @@ msgstr "简洁、强大、开源的SSH客户端。"
 #. running apps list
 msgctxt "service_desc"
 msgid "Maintains SSH connections and loaded pubkeys"
-msgstr "维护 SSH 连接和已加载的公钥"
+msgstr "维护 SSH 连接和已加载的密钥"
 
 #. Window title for the Host List
 msgctxt "title_hosts_list"
@@ -353,7 +353,7 @@ msgstr "旧密码："
 #. 'password' authentication.
 msgctxt "prompt_password"
 msgid "Password:"
-msgstr "新密码："
+msgstr "密码："
 
 #. Added after a "Password:" prompt to indicate user needs to confirm entry.
 msgctxt "prompt_again"
@@ -513,7 +513,7 @@ msgstr "在内存中为每个控制台保留的回滚缓存长度"
 #. Title of the preference used to enable or disable the back-up of pubkeys.
 msgctxt "pref_backupkeys_title"
 msgid "Backup pubkeys"
-msgstr "备份公钥"
+msgstr "备分密钥"
 
 #. Summary for the preference used to enable or disable the back-up of
 #. pubkeys.
@@ -772,7 +772,7 @@ msgstr "字型大小 (pt)"
 #. Host pubkey usage preference title
 msgctxt "hostpref_pubkeyid_title"
 msgid "Use pubkey authentication"
-msgstr "使用公钥验证"
+msgstr "使用密钥验证"
 
 #. Preference title for the SSH Authentication Agent Forwarding for a host
 #. connection
@@ -970,7 +970,7 @@ msgstr "端口"
 
 msgctxt "list_menu_pubkeys"
 msgid "Manage Pubkeys"
-msgstr "管理公钥"
+msgstr "管理密钥"
 
 #. Selection choice to sort hosts by color.
 msgctxt "list_menu_sortcolor"
@@ -1077,7 +1077,7 @@ msgstr "确定要删除'%1$s'吗？"
 
 msgctxt "delete_pos"
 msgid "Yes, delete"
-msgstr "是，删除"
+msgstr "删除"
 
 msgctxt "delete_neg"
 msgid "Cancel"
