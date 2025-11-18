@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.connectbot.util
 
-package org.connectbot.util;
-
-public interface OnEntropyGatheredListener {
-	void onEntropyGathered(byte[] entropy);
+interface OnEntropyGatheredListener {
+    fun onEntropyGathered(entropy: ByteArray?)
 }
