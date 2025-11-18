@@ -347,11 +347,18 @@ class SSH : AbsTransport, ConnectionMonitor, InteractiveCallback, AuthAgentCallb
             } else {
                 // load using internal generated format
                 val privateKey = pubkey.privateKey ?: return false
-                val privKey: PrivateKey = try {
+                val privKey = try {
                     PubkeyUtils.decodePrivate(privateKey, pubkey.type, password)
                 } catch (e: Exception) {
                     val message = String.format("Bad password for key '%s'. Authentication failed.", pubkey.nickname)
                     Log.e(TAG, message, e)
+                    bridge?.outputLine(message)
+                    return false
+                }
+
+                if (privKey == null) {
+                    val message = String.format("Failed to decode private key '%s'. Authentication failed.", pubkey.nickname)
+                    Log.e(TAG, message)
                     bridge?.outputLine(message)
                     return false
                 }

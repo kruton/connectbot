@@ -95,6 +95,7 @@ object PubkeyUtils {
         val salt = ByteArray(SALT_SIZE)
 
         val ciphertext = Encryptor.encrypt(salt, ITERATIONS, secret, cleartext)
+            ?: throw IllegalArgumentException("Encryption failed: ciphertext is null")
 
         val complete = ByteArray(salt.size + ciphertext.size)
 
@@ -121,10 +122,10 @@ object PubkeyUtils {
     @Throws(Exception::class)
     fun getEncodedPrivate(pk: PrivateKey, secret: String?): ByteArray {
         val encoded = pk.getEncoded()
-        if (secret == null || secret.length == 0) {
+        if (secret == null || secret.isEmpty()) {
             return encoded
         }
-        return encrypt(pk.getEncoded(), secret)
+        return encrypt(pk.encoded, secret)
     }
 
     @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
@@ -136,7 +137,7 @@ object PubkeyUtils {
 
     @Throws(Exception::class)
     fun decodePrivate(encoded: ByteArray, keyType: String?, secret: String?): PrivateKey? {
-        if (secret != null && secret.length > 0) return decodePrivate(
+        if (secret != null && secret.isNotEmpty()) return decodePrivate(
             decrypt(encoded, secret),
             keyType
         )
@@ -184,10 +185,6 @@ object PubkeyUtils {
     @JvmStatic
     @Throws(NoSuchAlgorithmException::class)
     fun getOidFromPkcs8Encoded(encoded: ByteArray): String? {
-        if (encoded == null) {
-            throw NoSuchAlgorithmException("encoding is null")
-        }
-
         try {
             val reader = SimpleDERReader(encoded)
             reader.resetInput(reader.readSequenceAsByteArray())
@@ -203,10 +200,6 @@ object PubkeyUtils {
     @JvmStatic
     @Throws(InvalidKeySpecException::class)
     fun getRSAPublicExponentFromPkcs8Encoded(encoded: ByteArray): BigInteger? {
-        if (encoded == null) {
-            throw InvalidKeySpecException("encoded key is null")
-        }
-
         try {
             val reader = SimpleDERReader(encoded)
             reader.resetInput(reader.readSequenceAsByteArray())
@@ -330,17 +323,17 @@ object PubkeyUtils {
         if (pk is RSAPublicKey) {
             var data = "ssh-rsa "
             data += String(Base64.encode(RSASHA1Verify.get().encodePublicKey(pk)))
-            return data + " " + nickname
+            return "$data $nickname"
         } else if (pk is DSAPublicKey) {
             var data = "ssh-dss "
             data += String(Base64.encode(DSASHA1Verify.get().encodePublicKey(pk)))
-            return data + " " + nickname
+            return "$data $nickname"
         } else if (pk is ECPublicKey) {
             val ecPub = pk
             val keyType = ECDSASHA2Verify.getSshKeyType(ecPub)
             val verifier: SSHSignature = ECDSASHA2Verify.getVerifierForKey(ecPub)
             val keyData = String(Base64.encode(verifier.encodePublicKey(ecPub)))
-            return keyType + " " + keyData + " " + nickname
+            return "$keyType $keyData $nickname"
         } else if (pk is Ed25519PublicKey) {
             val edPub = pk
             return Ed25519Verify.ED25519_ID + " " + String(
@@ -375,7 +368,7 @@ object PubkeyUtils {
             } else {
                 return null
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             return null
         }
     }

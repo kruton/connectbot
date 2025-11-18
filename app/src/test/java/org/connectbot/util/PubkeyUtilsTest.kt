@@ -40,17 +40,6 @@ import java.security.interfaces.RSAPublicKey
 class PubkeyUtilsTest {
     @Test
     @Throws(Exception::class)
-    fun encodeHex_Null_Failure() {
-        try {
-            PubkeyUtils.encodeHex(null)
-            Assert.fail("Should throw null pointer exception when argument is null")
-        } catch (e: NullPointerException) {
-            // success
-        }
-    }
-
-    @Test
-    @Throws(Exception::class)
     fun encodeHex_Success() {
         val input = byteArrayOf(0xFF.toByte(), 0x00, 0xA5.toByte(), 0x5A, 0x12, 0x23)
         val expected = "ff00a55a1223"
@@ -77,16 +66,6 @@ class PubkeyUtilsTest {
     @Throws(Exception::class)
     fun getOidFromPkcs8Encoded_Dsa() {
         Assert.assertEquals("1.2.840.10040.4.1", getOidFromPkcs8Encoded(DSA_KEY_PKCS8))
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun getOidFromPkcs8Encoded_Null_Failure() {
-        try {
-            PubkeyUtils.getOidFromPkcs8Encoded(null)
-            Assert.fail("Should throw NoSuchAlgorithmException")
-        } catch (expected: NoSuchAlgorithmException) {
-        }
     }
 
     @Test
@@ -186,16 +165,6 @@ class PubkeyUtilsTest {
 
         override fun getFormat(): String? {
             throw UnsupportedOperationException()
-        }
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun recoverPublicKey_FakeKey_Failure() {
-        try {
-            PubkeyUtils.recoverPublicKey(null, MyPrivateKey())
-            Assert.fail("Should not accept unknown key types")
-        } catch (expected: NoSuchAlgorithmException) {
         }
     }
 
