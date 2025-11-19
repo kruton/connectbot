@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 
 import java.io.IOException
 import java.nio.charset.Charset
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.regex.Pattern
 
 import de.mud.terminal.VDUBuffer
@@ -120,7 +121,7 @@ class TerminalBridge : VDUDisplay {
 
     val promptManager = PromptManager()
 
-    private val disconnectListeners = mutableListOf<BridgeDisconnectedListener>()
+    private val disconnectListeners = CopyOnWriteArrayList<BridgeDisconnectedListener>()
 
     /**
      * Create new terminal bridge with following parameters. We will immediately
@@ -400,26 +401,20 @@ class TerminalBridge : VDUDisplay {
         }
 
     fun setOnDisconnectedListener(disconnectListener: BridgeDisconnectedListener?) {
-        synchronized(disconnectListeners) {
-            disconnectListeners.clear()
-            if (disconnectListener != null) {
-                disconnectListeners.add(disconnectListener)
-            }
+        disconnectListeners.clear()
+        if (disconnectListener != null) {
+            disconnectListeners.add(disconnectListener)
         }
     }
 
     fun addOnDisconnectedListener(listener: BridgeDisconnectedListener?) {
-        synchronized(disconnectListeners) {
-            if (listener != null && !disconnectListeners.contains(listener)) {
-                disconnectListeners.add(listener)
-            }
+        if (listener != null && !disconnectListeners.contains(listener)) {
+            disconnectListeners.add(listener)
         }
     }
 
     fun removeOnDisconnectedListener(listener: BridgeDisconnectedListener?) {
-        synchronized(disconnectListeners) {
-            disconnectListeners.remove(listener)
-        }
+        disconnectListeners.remove(listener)
     }
 
     /**
@@ -473,19 +468,20 @@ class TerminalBridge : VDUDisplay {
      * Tells the TerminalManager that we can be destroyed now.
      */
     private fun triggerDisconnectListener() {
-        val listenersCopy: List<BridgeDisconnectedListener>
-        synchronized(disconnectListeners) {
-            if (disconnectListeners.isEmpty()) {
-                return
-            }
-            listenersCopy = ArrayList(disconnectListeners)
+        if (disconnectListeners.isEmpty()) {
+            // Clean up even if no listeners
+            cleanup()
+            return
         }
 
         // The disconnect listener should be run on the main thread if possible.
+        // CopyOnWriteArrayList is safe to iterate even if modified during iteration
         scope.launch(Dispatchers.Main) {
-            for (listener in listenersCopy) {
+            for (listener in disconnectListeners) {
                 listener.onDisconnected(this@TerminalBridge)
             }
+            // Clean up after notifying all listeners
+            cleanup()
         }
     }
 
@@ -679,9 +675,30 @@ class TerminalBridge : VDUDisplay {
     }
 
     private fun discardBitmap() {
-        if (bitmap != null)
-            bitmap!!.recycle()
+        bitmap?.recycle()
         bitmap = null
+    }
+
+    /**
+     * Clean up when view is being detached (e.g., during configuration changes).
+     * Discards bitmap and clears parent reference to prevent memory leaks.
+     * Called from TerminalView.onDetachedFromWindow()
+     */
+    fun onViewDetached() {
+        discardBitmap()
+        parent = null
+        // Request GC to free bitmap memory immediately before new view creates new bitmap
+        System.gc()
+    }
+
+    /**
+     * Clean up resources when bridge is being destroyed.
+     * Releases bitmap and clears parent reference to prevent memory leaks.
+     */
+    fun cleanup() {
+        discardBitmap()
+        parent = null
+        scope.cancel()
     }
 
     override fun setVDUBuffer(buffer: VDUBuffer) {
@@ -1089,13 +1106,6 @@ class TerminalBridge : VDUDisplay {
      */
     fun decreaseFontSize() {
         setFontSize(fontSizeDp - FONT_SIZE_STEP)
-    }
-
-    /**
-     * Cancel the coroutine scope and clean up any running coroutines.
-     */
-    fun cancelScope() {
-        scope.cancel()
     }
 
     companion object {
