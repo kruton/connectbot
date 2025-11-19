@@ -273,8 +273,7 @@ class TerminalBridge : VDUDisplay {
      * @param encoding the canonical name of the character encoding
      */
     fun setCharset(encoding: String) {
-        if (relay != null)
-            relay!!.setCharset(encoding)
+        relay?.setCharset(encoding)
         keyListener.setCharset(encoding)
     }
 
