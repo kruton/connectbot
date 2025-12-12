@@ -253,12 +253,8 @@ class HostRepository @Inject constructor(
      * @return List of algorithm names
      */
     suspend fun getHostKeyAlgorithmsForHost(hostname: String, port: Int): List<String> {
-        val knownHost = knownHostDao.getByHostnameAndPort(hostname, port)
-        return if (knownHost != null) {
-            listOf(knownHost.hostKeyAlgo)
-        } else {
-            emptyList()
-        }
+        val knownHosts = knownHostDao.getByHostnameAndPort(hostname, port)
+        return knownHosts.map { it.hostKeyAlgo }
     }
 
     /**
@@ -278,7 +274,7 @@ class HostRepository @Inject constructor(
         serverHostKey: ByteArray
     ) {
         // Check if already exists
-        val existing = knownHostDao.getByHostnameAndPort(hostname, port)
+        val existing = knownHostDao.getByHostnamePortAndAlgo(hostname, port, serverHostKeyAlgorithm)
         if (existing != null) {
             // Update existing - keep the same hostId
             val updated = existing.copy(
@@ -313,7 +309,7 @@ class HostRepository @Inject constructor(
         serverHostKeyAlgorithm: String,
         serverHostKey: ByteArray
     ) {
-        val knownHost = knownHostDao.getByHostnameAndPort(hostname, port)
+        val knownHost = knownHostDao.getByHostnamePortAndAlgo(hostname, port, serverHostKeyAlgorithm)
         if (knownHost != null &&
             knownHost.hostKeyAlgo == serverHostKeyAlgorithm &&
             knownHost.hostKey.contentEquals(serverHostKey)) {
