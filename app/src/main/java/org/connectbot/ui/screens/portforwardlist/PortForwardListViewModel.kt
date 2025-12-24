@@ -137,7 +137,11 @@ class PortForwardListViewModel @Inject constructor(
                 }
 
                 withActiveBridge { bridge ->
-                    bridge.transport?.addPortForward(newPortForward)
+                    bridge.transport?.let {
+                        it.addPortForward(newPortForward)
+                        it.enablePortForward(newPortForward)
+                    }
+
                     Timber.d("Added port forward ${newPortForward.nickname} to active connection")
                 }
             } catch (e: Exception) {
