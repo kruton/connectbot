@@ -37,11 +37,14 @@ import kotlinx.coroutines.withContext
 import org.connectbot.data.ProfileRepository
 import org.connectbot.data.entity.Profile
 import org.connectbot.di.CoroutineDispatchers
+import org.connectbot.util.AdaptiveUiPreferences
 import org.connectbot.util.LocalFontProvider
 import org.connectbot.util.PreferenceConstants
 import org.connectbot.util.TerminalFontProvider
 import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 
 data class SettingsUiState(
     val memkeys: Boolean = true,
@@ -82,6 +85,7 @@ data class SettingsUiState(
 class SettingsViewModel @Inject constructor(
     private val prefs: SharedPreferences,
     private val profileRepository: ProfileRepository,
+    private val adaptiveUiPreferences: AdaptiveUiPreferences,
     @ApplicationContext private val context: Context,
     private val dispatchers: CoroutineDispatchers
 ) : ViewModel() {
@@ -89,6 +93,21 @@ class SettingsViewModel @Inject constructor(
     private val localFontProvider = LocalFontProvider(context)
     private val _uiState = MutableStateFlow(loadSettings())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+
+    // Adaptive UI preferences (for tablet/desktop layouts)
+    val keepListVisibleOnTablets = adaptiveUiPreferences.keepListVisible
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val autoCollapseAfterConnection = adaptiveUiPreferences.autoCollapseAfterConnection
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 
     private val _requestNotificationPermission = Channel<Unit>(Channel.CONFLATED)
     val requestNotificationPermission = _requestNotificationPermission.receiveAsFlow()
@@ -460,6 +479,19 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.edit { putFloat(key, value) }
             _uiState.update { it.updateState() }
+        }
+    }
+
+    // Adaptive UI preference update methods
+    fun updateKeepListVisible(value: Boolean) {
+        viewModelScope.launch {
+            adaptiveUiPreferences.setKeepListVisible(value)
+        }
+    }
+
+    fun updateAutoCollapse(value: Boolean) {
+        viewModelScope.launch {
+            adaptiveUiPreferences.setAutoCollapse(value)
         }
     }
 }

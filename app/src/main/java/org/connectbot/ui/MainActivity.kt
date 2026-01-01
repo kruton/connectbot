@@ -286,9 +286,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            ConnectBotApp(
+            AdaptiveConnectBotApp(
                 appUiState = appUiState,
-                navController = navController,
                 makingShortcut = makingShortcut,
                 onRetryMigration = { appViewModel.retryMigration() },
                 onShortcutSelected = { host ->
