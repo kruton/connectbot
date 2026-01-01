@@ -17,10 +17,14 @@
 
 package org.connectbot.ui.screens.hosts
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -668,42 +672,60 @@ private fun HostDetailPane(
             .fillMaxSize()
             .padding(padding)
         ) {
+            // Terminal view with slide animation
+            AnimatedContent(
+                targetState = currentBridgeIndex,
+                transitionSpec = {
+                    val animationSpec = tween<androidx.compose.ui.unit.IntOffset>(durationMillis = 200)
+                    if (targetState > initialState) {
+                        // Sliding left (next tab)
+                        slideInHorizontally(animationSpec) { width -> width } togetherWith
+                            slideOutHorizontally(animationSpec) { width -> -width }
+                    } else {
+                        // Sliding right (previous tab)
+                        slideInHorizontally(animationSpec) { width -> -width } togetherWith
+                            slideOutHorizontally(animationSpec) { width -> width }
+                    }
+                },
+                label = "terminal_slide",
+                modifier = Modifier.fillMaxSize()
+            ) { bridgeIndex ->
+                val bridge = bridges.getOrNull(bridgeIndex)
+                if (bridge != null) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Terminal(
+                            terminalEmulator = bridge.terminalEmulator,
+                            modifier = Modifier.fillMaxSize(),
+                            typeface = fontResult.typeface,
+                            initialFontSize = fontSize.sp,
+                            keyboardEnabled = true,
+                            showSoftKeyboard = false,
+                            focusRequester = termFocusRequester,
+                            forcedSize = null,
+                            modifierManager = bridge.keyHandler,
+                            onTerminalTap = {},
+                            onImeVisibilityChanged = {}
+                        )
 
-        // Terminal view
-        if (currentBridge != null) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Terminal(
-                    terminalEmulator = currentBridge.terminalEmulator,
-                    modifier = Modifier.fillMaxSize(),
-                    typeface = fontResult.typeface,
-                    initialFontSize = fontSize.sp,
-                    keyboardEnabled = true,
-                    showSoftKeyboard = false,
-                    focusRequester = termFocusRequester,
-                    forcedSize = null,
-                    modifierManager = currentBridge.keyHandler,
-                    onTerminalTap = {},
-                    onImeVisibilityChanged = {}
-                )
+                        // Show inline prompts from the current bridge (non-modal at bottom)
+                        val promptState by bridge.promptManager.promptState.collectAsState()
 
-                // Show inline prompts from the current bridge (non-modal at bottom)
-                val promptState by currentBridge.promptManager.promptState.collectAsState()
-
-                InlinePrompt(
-                    promptRequest = promptState,
-                    onResponse = { response ->
-                        currentBridge.promptManager.respond(response)
-                    },
-                    onCancel = {
-                        currentBridge.promptManager.cancelPrompt()
-                    },
-                    onDismissed = {
-                        termFocusRequester.requestFocus()
-                    },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
+                        InlinePrompt(
+                            promptRequest = promptState,
+                            onResponse = { response ->
+                                bridge.promptManager.respond(response)
+                            },
+                            onCancel = {
+                                bridge.promptManager.cancelPrompt()
+                            },
+                            onDismissed = {
+                                termFocusRequester.requestFocus()
+                            },
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                        )
+                    }
+                }
             }
-        }
         }
     }
 }
