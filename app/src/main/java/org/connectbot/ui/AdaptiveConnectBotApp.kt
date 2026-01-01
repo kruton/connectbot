@@ -31,20 +31,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.connectbot.R
 import org.connectbot.data.entity.Host
+import org.connectbot.ui.navigation.navigateSafely
+import org.connectbot.ui.navigation.safePopBackStack
+import org.connectbot.ui.navigation.NavArgs
 import org.connectbot.ui.navigation.NavDestinations
+import org.connectbot.ui.screens.hosteditor.HostEditorScreen
 import org.connectbot.ui.screens.hosts.HostsAdaptiveScreen
 import org.connectbot.ui.screens.pubkeylist.PubkeyListScreen
 import org.connectbot.ui.screens.profiles.ProfileListScreen
 import org.connectbot.ui.screens.settings.SettingsScreen
 import org.connectbot.ui.theme.ConnectBotTheme
+import timber.log.Timber
 
 /**
  * Top-level destinations for the adaptive navigation suite.
@@ -66,6 +76,7 @@ enum class AdaptiveDestination {
 @Composable
 fun AdaptiveConnectBotApp(
     appUiState: AppUiState,
+    navController: NavHostController,
     makingShortcut: Boolean,
     onRetryMigration: () -> Unit,
     onShortcutSelected: (Host) -> Unit,
@@ -99,12 +110,34 @@ fun AdaptiveConnectBotApp(
 
             is AppUiState.Ready -> {
                 CompositionLocalProvider(LocalTerminalManager provides appUiState.terminalManager) {
-                    AdaptiveNavigationContent(
-                        makingShortcut = makingShortcut,
-                        onShortcutSelected = onShortcutSelected,
-                        onNavigateToConsole = onNavigateToConsole,
+                    NavHost(
+                        navController = navController,
+                        startDestination = "adaptive_home",
                         modifier = modifier
-                    )
+                    ) {
+                        composable("adaptive_home") {
+                            AdaptiveNavigationContent(
+                                navController = navController,
+                                makingShortcut = makingShortcut,
+                                onShortcutSelected = onShortcutSelected,
+                                onNavigateToConsole = onNavigateToConsole
+                            )
+                        }
+
+                        composable(
+                            route = "${NavDestinations.HOST_EDITOR}?${NavArgs.HOST_ID}={${NavArgs.HOST_ID}}",
+                            arguments = listOf(
+                                navArgument(NavArgs.HOST_ID) {
+                                    type = NavType.LongType
+                                    defaultValue = -1L
+                                }
+                            )
+                        ) {
+                            HostEditorScreen(
+                                onNavigateBack = { navController.safePopBackStack() }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -113,6 +146,7 @@ fun AdaptiveConnectBotApp(
 
 @Composable
 private fun AdaptiveNavigationContent(
+    navController: NavHostController,
     makingShortcut: Boolean,
     onShortcutSelected: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
@@ -120,75 +154,114 @@ private fun AdaptiveNavigationContent(
 ) {
     // Track selected destination - persists across configuration changes
     var selectedDestination by rememberSaveable { mutableStateOf(AdaptiveDestination.HOSTS) }
+    var showNavigation by remember { mutableStateOf(true) }
 
-    // Create NavController for nested navigation within each destination
-    val navController = rememberNavController()
+    Timber.d("AdaptiveNavigationContent: showNavigation=$showNavigation, selectedDestination=$selectedDestination")
 
-    NavigationSuiteScaffold(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        navigationSuiteItems = {
-            item(
-                selected = selectedDestination == AdaptiveDestination.HOSTS,
-                onClick = { selectedDestination = AdaptiveDestination.HOSTS },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Storage,
-                        contentDescription = stringResource(R.string.title_hosts)
-                    )
-                },
-                label = { Text(stringResource(R.string.title_hosts)) }
-            )
+    if (showNavigation) {
+        NavigationSuiteScaffold(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            navigationSuiteItems = {
+                item(
+                    selected = selectedDestination == AdaptiveDestination.HOSTS,
+                    onClick = { selectedDestination = AdaptiveDestination.HOSTS },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Storage,
+                            contentDescription = stringResource(R.string.title_hosts)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.title_hosts)) }
+                )
 
-            item(
-                selected = selectedDestination == AdaptiveDestination.PUBLIC_KEYS,
-                onClick = { selectedDestination = AdaptiveDestination.PUBLIC_KEYS },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Key,
-                        contentDescription = stringResource(R.string.title_pubkey_list)
-                    )
-                },
-                label = { Text(stringResource(R.string.title_pubkey_list)) }
-            )
+                item(
+                    selected = selectedDestination == AdaptiveDestination.PUBLIC_KEYS,
+                    onClick = { selectedDestination = AdaptiveDestination.PUBLIC_KEYS },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Key,
+                            contentDescription = stringResource(R.string.title_pubkey_list)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.title_pubkey_list)) }
+                )
 
-            item(
-                selected = selectedDestination == AdaptiveDestination.PROFILES,
-                onClick = { selectedDestination = AdaptiveDestination.PROFILES },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = stringResource(R.string.profile_list_title)
-                    )
-                },
-                label = { Text(stringResource(R.string.profile_list_title)) }
-            )
+                item(
+                    selected = selectedDestination == AdaptiveDestination.PROFILES,
+                    onClick = { selectedDestination = AdaptiveDestination.PROFILES },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = stringResource(R.string.profile_list_title)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.profile_list_title)) }
+                )
 
-            item(
-                selected = selectedDestination == AdaptiveDestination.SETTINGS,
-                onClick = { selectedDestination = AdaptiveDestination.SETTINGS },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.title_settings)
-                    )
-                },
-                label = { Text(stringResource(R.string.title_settings)) }
-            )
-        },
-        modifier = modifier
-    ) {
-        // Show the selected destination's content
-        when (selectedDestination) {
-            AdaptiveDestination.HOSTS -> HostsDestination(
+                item(
+                    selected = selectedDestination == AdaptiveDestination.SETTINGS,
+                    onClick = { selectedDestination = AdaptiveDestination.SETTINGS },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.title_settings)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.title_settings)) }
+                )
+            },
+            modifier = modifier
+        ) {
+            DestinationContent(
+                selectedDestination = selectedDestination,
                 navController = navController,
                 makingShortcut = makingShortcut,
                 onShortcutSelected = onShortcutSelected,
-                onNavigateToConsole = onNavigateToConsole
+                onNavigateToConsole = onNavigateToConsole,
+                onNavigationVisibilityChange = { visible -> showNavigation = visible }
             )
-            AdaptiveDestination.PUBLIC_KEYS -> PublicKeysDestination(navController = navController)
-            AdaptiveDestination.PROFILES -> ProfilesDestination(navController = navController)
-            AdaptiveDestination.SETTINGS -> SettingsDestination()
         }
+    } else {
+        // No navigation - just show content directly
+        DestinationContent(
+            selectedDestination = selectedDestination,
+            navController = navController,
+            makingShortcut = makingShortcut,
+            onShortcutSelected = onShortcutSelected,
+            onNavigateToConsole = onNavigateToConsole,
+            onNavigationVisibilityChange = { visible -> showNavigation = visible },
+            modifier = modifier
+        )
+    }
+}
+
+/**
+ * Content for the selected destination
+ */
+@Composable
+private fun DestinationContent(
+    selectedDestination: AdaptiveDestination,
+    navController: NavHostController,
+    makingShortcut: Boolean,
+    onShortcutSelected: (Host) -> Unit,
+    onNavigateToConsole: (Host) -> Unit,
+    onNavigationVisibilityChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (selectedDestination) {
+        AdaptiveDestination.HOSTS -> HostsDestination(
+            navController = navController,
+            makingShortcut = makingShortcut,
+            onShortcutSelected = onShortcutSelected,
+            onNavigateToConsole = onNavigateToConsole,
+            onNavigationVisibilityChange = { visible ->
+                Timber.d("HostsDestination onNavigationVisibilityChange: visible=$visible")
+                onNavigationVisibilityChange(visible)
+            }
+        )
+        AdaptiveDestination.PUBLIC_KEYS -> PublicKeysDestination(navController = navController)
+        AdaptiveDestination.PROFILES -> ProfilesDestination(navController = navController)
+        AdaptiveDestination.SETTINGS -> SettingsDestination()
     }
 }
 
@@ -201,6 +274,7 @@ private fun HostsDestination(
     makingShortcut: Boolean,
     onShortcutSelected: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
+    onNavigationVisibilityChange: (Boolean) -> Unit = {},
 ) {
     HostsAdaptiveScreen(
         makingShortcut = makingShortcut,
@@ -208,11 +282,12 @@ private fun HostsDestination(
         onNavigateToConsole = onNavigateToConsole,
         onNavigateToHostEditor = { hostId ->
             if (hostId != null) {
-                navController.navigate("${NavDestinations.HOST_EDITOR}/$hostId")
+                navController.navigateSafely("${NavDestinations.HOST_EDITOR}?hostId=$hostId")
             } else {
-                navController.navigate(NavDestinations.HOST_EDITOR)
+                navController.navigateSafely(NavDestinations.HOST_EDITOR)
             }
-        }
+        },
+        onNavigationVisibilityChange = onNavigationVisibilityChange
     )
 }
 

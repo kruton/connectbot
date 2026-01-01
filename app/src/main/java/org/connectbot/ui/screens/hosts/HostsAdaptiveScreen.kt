@@ -17,11 +17,20 @@
 
 package org.connectbot.ui.screens.hosts
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,9 +38,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Close
@@ -40,6 +52,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.Button
@@ -68,6 +81,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -82,6 +97,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -100,7 +117,9 @@ import org.connectbot.R
 import org.connectbot.data.entity.Host
 import org.connectbot.terminal.Terminal
 import org.connectbot.ui.LocalTerminalManager
+import org.connectbot.ui.components.InlinePrompt
 import org.connectbot.util.rememberTerminalTypefaceResultFromStoredValue
+import timber.log.Timber
 
 /**
  * Adaptive Hosts screen using ListDetailPaneScaffold.
@@ -114,6 +133,7 @@ fun HostsAdaptiveScreen(
     onShortcutSelected: (Host) -> Unit = {},
     onNavigateToConsole: (Host) -> Unit = {},
     onNavigateToHostEditor: (Long?) -> Unit = {},
+    onNavigationVisibilityChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: HostsViewModel = hiltViewModel()
 ) {
@@ -136,62 +156,226 @@ fun HostsAdaptiveScreen(
     }
 
     val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+    val scope = rememberCoroutineScope()
+    var hostRailExpanded by remember { mutableStateOf(false) }
 
-    // Navigate to detail pane when a host is selected
-    LaunchedEffect(uiState.selectedHostId) {
+    // Navigate to detail pane only when the bridge for the selected host exists.
+    // This prevents premature navigation during connection establishment.
+    LaunchedEffect(uiState.selectedHostId, uiState.bridges) {
         uiState.selectedHostId?.let { hostId ->
-            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, hostId)
+            val bridgeExists = uiState.bridges.any { it.host.id == hostId }
+            Timber.d("Navigation check: hostId=$hostId, bridgeExists=$bridgeExists, bridges=${uiState.bridges.map { it.host.id }}")
+            if (bridgeExists) {
+                Timber.d("Navigating to detail pane for hostId=$hostId")
+                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, hostId)
+            } else {
+                Timber.d("NOT navigating yet - bridge doesn't exist for hostId=$hostId")
+            }
         }
     }
 
-    ListDetailPaneScaffold(
-        directive = navigator.scaffoldDirective,
-        value = navigator.scaffoldValue,
-        listPane = {
-            AnimatedPane {
-                HostListPane(
-                    hosts = uiState.hosts,
-                    connectionStates = uiState.connectionStates,
-                    sortedByColor = uiState.sortedByColor,
-                    makingShortcut = makingShortcut,
-                    onHostClick = { host ->
-                        if (makingShortcut) {
-                            onShortcutSelected(host)
-                        } else {
-                            viewModel.selectHost(host.id)
-                        }
-                    },
-                    onHostConnect = { host ->
-                        viewModel.connectToHost(host)
-                    },
-                    onToggleSortOrder = { viewModel.toggleSortOrder() },
-                    onShowQuickConnect = { viewModel.showQuickConnect() },
-                    onNavigateToHostEditor = onNavigateToHostEditor,
-                    onDeleteHost = { host -> viewModel.deleteHost(host) },
-                    onDisconnectHost = { host -> viewModel.disconnectHost(host) },
-                    onForgetHostKeys = { host -> viewModel.forgetHostKeys(host) },
-                    modifier = Modifier.fillMaxSize()
-                )
+    // In phone layout, navigate back when all hosts disconnect
+    // Only navigate back if we're actually on the detail pane
+    LaunchedEffect(uiState.bridges.isEmpty(), navigator.canNavigateBack(), navigator.currentDestination?.pane) {
+        val isOnDetailPane = navigator.currentDestination?.pane == ListDetailPaneScaffoldRole.Detail
+        Timber.d("Auto-navigate-back check: canNavigateBack=${navigator.canNavigateBack()}, bridgesEmpty=${uiState.bridges.isEmpty()}, selectedHostId=${uiState.selectedHostId}, isOnDetailPane=$isOnDetailPane")
+        if (navigator.canNavigateBack() &&
+            uiState.bridges.isEmpty() &&
+            uiState.selectedHostId != null &&
+            isOnDetailPane) {
+            Timber.d("Auto-navigating back to list")
+            scope.launch {
+                navigator.navigateBack()
             }
-        },
-        detailPane = {
-            AnimatedPane {
-                if (uiState.selectedHostId != null && uiState.bridges.isNotEmpty()) {
-                    HostDetailPane(
-                        bridges = uiState.bridges,
-                        currentBridgeIndex = uiState.currentBridgeIndex,
-                        onBridgeSelect = { index -> viewModel.selectBridge(index) },
-                        modifier = Modifier.fillMaxSize()
+        }
+    }
+
+    // Clear selectedHostId when on the list pane in phone mode.
+    // This allows re-selecting the same host to navigate to detail pane again.
+    LaunchedEffect(navigator.currentDestination?.pane, uiState.selectedHostId) {
+        val currentPane = navigator.currentDestination?.pane
+        val isOnListPane = currentPane == ListDetailPaneScaffoldRole.List
+
+        Timber.d("Clear selection check: currentPane=$currentPane, isOnListPane=$isOnListPane, selectedHostId=${uiState.selectedHostId}")
+
+        // When on the list pane, clear selection so the same host can be selected again
+        if (isOnListPane && uiState.selectedHostId != null) {
+            Timber.d("Clearing selectedHostId because we're on the list pane")
+            viewModel.selectHost(null)
+        }
+    }
+
+    // Notify parent about navigation visibility based on phone mode and detail pane visibility.
+    // Only hide navigation when we're actually showing a bridge in the detail pane,
+    // not while waiting for a connection to establish.
+    val canNavigateBack = navigator.canNavigateBack()
+    val currentPane = navigator.currentDestination?.pane
+    val hasBridge = uiState.bridges.isNotEmpty()
+    val shouldHideNavigation = canNavigateBack &&
+                                currentPane == ListDetailPaneScaffoldRole.Detail &&
+                                hasBridge
+
+    // Use snapshotFlow to only trigger when the actual value changes, not on every recomposition
+    LaunchedEffect(Unit) {
+        snapshotFlow { shouldHideNavigation }
+            .distinctUntilChanged()
+            .collect { shouldHide ->
+                Timber.d("Navigation visibility CHANGED: shouldHide=$shouldHide (canNavigateBack=$canNavigateBack, currentPane=$currentPane, hasBridge=$hasBridge)")
+                Timber.d("Calling onNavigationVisibilityChange(!shouldHide=${!shouldHide})")
+                onNavigationVisibilityChange(!shouldHide)
+            }
+    }
+
+    // In dual-pane mode with connected host, use collapsible rail instead of list pane
+    // Only use rail if we're actually in expanded mode (dual-pane capable)
+    val isConnected = uiState.selectedHostId != null && uiState.bridges.isNotEmpty()
+    val isExpandedMode = navigator.scaffoldDirective.maxHorizontalPartitions > 1
+    val shouldUseRail = !navigator.canNavigateBack() && isConnected && isExpandedMode
+
+    if (shouldUseRail) {
+        // Dual-pane mode: collapsible rail overlaying full-screen terminal
+        Box(modifier = modifier.fillMaxSize()) {
+            // Full-width terminal with session tabs in TopAppBar
+            HostDetailPane(
+                bridges = uiState.bridges,
+                currentBridgeIndex = uiState.currentBridgeIndex,
+                onBridgeSelect = { index ->
+                    viewModel.selectBridge(index)
+                    hostRailExpanded = false
+                },
+                canNavigateBack = false,
+                onToggleHostList = { hostRailExpanded = !hostRailExpanded },
+                onNavigateBack = {},
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (hostRailExpanded) {
+                            Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                hostRailExpanded = false
+                            }
+                        } else {
+                            Modifier
+                        }
                     )
-                } else {
-                    EmptyDetailPane(
+            )
+
+            // Collapsible host list rail overlaying on the left
+            AnimatedVisibility(
+                visible = hostRailExpanded,
+                enter = expandHorizontally(
+                    animationSpec = tween(300),
+                    expandFrom = Alignment.Start
+                ),
+                exit = shrinkHorizontally(
+                    animationSpec = tween(300),
+                    shrinkTowards = Alignment.Start
+                ),
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .width(360.dp)
+                        .fillMaxHeight(),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shadowElevation = 8.dp
+                ) {
+                    HostListPane(
+                        hosts = uiState.hosts,
+                        connectionStates = uiState.connectionStates,
+                        sortedByColor = uiState.sortedByColor,
+                        makingShortcut = makingShortcut,
+                        onHostClick = { host ->
+                            hostRailExpanded = false
+                            if (makingShortcut) {
+                                onShortcutSelected(host)
+                            } else {
+                                viewModel.selectHost(host.id)
+                            }
+                        },
+                        onHostConnect = { host ->
+                            Timber.d("onHostConnect called for host: ${host.nickname} (id=${host.id})")
+                            hostRailExpanded = false
+                            viewModel.connectToHost(host)
+                        },
+                        onToggleSortOrder = { viewModel.toggleSortOrder() },
+                        onShowQuickConnect = {
+                            hostRailExpanded = false
+                            viewModel.showQuickConnect()
+                        },
+                        onNavigateToHostEditor = { hostId ->
+                            hostRailExpanded = false
+                            onNavigateToHostEditor(hostId)
+                        },
+                        onDeleteHost = { host -> viewModel.deleteHost(host) },
+                        onDisconnectHost = { host -> viewModel.disconnectHost(host) },
+                        onForgetHostKeys = { host -> viewModel.forgetHostKeys(host) },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
-        },
-        modifier = modifier
-    )
+        }
+    } else {
+        // Single-pane mode or no connection: use standard ListDetailPaneScaffold
+        ListDetailPaneScaffold(
+            directive = navigator.scaffoldDirective,
+            value = navigator.scaffoldValue,
+            listPane = {
+                AnimatedPane {
+                    HostListPane(
+                        hosts = uiState.hosts,
+                        connectionStates = uiState.connectionStates,
+                        sortedByColor = uiState.sortedByColor,
+                        makingShortcut = makingShortcut,
+                        onHostClick = { host ->
+                            if (makingShortcut) {
+                                onShortcutSelected(host)
+                            } else {
+                                viewModel.selectHost(host.id)
+                            }
+                        },
+                        onHostConnect = { host ->
+                            Timber.d("onHostConnect called for host: ${host.nickname} (id=${host.id})")
+                            viewModel.connectToHost(host)
+                        },
+                        onToggleSortOrder = { viewModel.toggleSortOrder() },
+                        onShowQuickConnect = { viewModel.showQuickConnect() },
+                        onNavigateToHostEditor = onNavigateToHostEditor,
+                        onDeleteHost = { host -> viewModel.deleteHost(host) },
+                        onDisconnectHost = { host -> viewModel.disconnectHost(host) },
+                        onForgetHostKeys = { host -> viewModel.forgetHostKeys(host) },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            },
+            detailPane = {
+                AnimatedPane {
+                    if (uiState.selectedHostId != null && uiState.bridges.isNotEmpty()) {
+                        HostDetailPane(
+                            bridges = uiState.bridges,
+                            currentBridgeIndex = uiState.currentBridgeIndex,
+                            onBridgeSelect = { index -> viewModel.selectBridge(index) },
+                            canNavigateBack = navigator.canNavigateBack(),
+                            onToggleHostList = null,
+                            onNavigateBack = {
+                                scope.launch {
+                                    navigator.navigateBack()
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        EmptyDetailPane(
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+            },
+            modifier = modifier
+        )
+    }
 
     // Show snackbar for errors
     SnackbarHost(
@@ -442,6 +626,9 @@ private fun HostDetailPane(
     bridges: List<org.connectbot.service.TerminalBridge>,
     currentBridgeIndex: Int,
     onBridgeSelect: (Int) -> Unit,
+    canNavigateBack: Boolean,
+    onToggleHostList: (() -> Unit)?,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -451,32 +638,36 @@ private fun HostDetailPane(
     val fontSize = remember { prefs.getInt("fontsize", 10) }
     val termFocusRequester = remember { FocusRequester() }
 
-    Surface(
-        color = MaterialTheme.colorScheme.surface,
-        modifier = modifier
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-        // Show tabs for session switching if multiple bridges
-        if (bridges.size > 1) {
-            // Use scrollable tab row with fade edges for better UX with many sessions
-            PrimaryScrollableTabRow(
-                selectedTabIndex = currentBridgeIndex
-            ) {
-                bridges.forEachIndexed { index, bridge ->
-                    Tab(
-                        selected = index == currentBridgeIndex,
-                        onClick = { onBridgeSelect(index) },
-                        text = {
-                            Text(
-                                text = bridge.host.nickname,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    )
-                }
+    Scaffold(
+        topBar = {
+            // Show custom top app bar with navigation button and session selector
+            if (canNavigateBack) {
+                // Single-pane mode: back button + session tabs (no rail menu)
+                HostSelectorTopAppBar(
+                    bridges = bridges,
+                    currentBridgeIndex = currentBridgeIndex,
+                    onBridgeSelect = onBridgeSelect,
+                    onNavigateBack = onNavigateBack,
+                    useMenuIcon = false
+                )
+            } else if (onToggleHostList != null) {
+                // Dual-pane mode: menu button + session tabs (with rail menu)
+                HostSelectorTopAppBar(
+                    bridges = bridges,
+                    currentBridgeIndex = currentBridgeIndex,
+                    onBridgeSelect = onBridgeSelect,
+                    onNavigateBack = onToggleHostList,
+                    useMenuIcon = true
+                )
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        modifier = modifier
+    ) { padding ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+        ) {
 
         // Terminal view
         if (currentBridge != null) {
@@ -494,10 +685,95 @@ private fun HostDetailPane(
                     onTerminalTap = {},
                     onImeVisibilityChanged = {}
                 )
+
+                // Show inline prompts from the current bridge (non-modal at bottom)
+                val promptState by currentBridge.promptManager.promptState.collectAsState()
+
+                InlinePrompt(
+                    promptRequest = promptState,
+                    onResponse = { response ->
+                        currentBridge.promptManager.respond(response)
+                    },
+                    onCancel = {
+                        currentBridge.promptManager.cancelPrompt()
+                    },
+                    onDismissed = {
+                        termFocusRequester.requestFocus()
+                    },
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
             }
         }
         }
     }
+}
+
+/**
+ * Custom TopAppBar that combines navigation button with horizontal scrollable host selector.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HostSelectorTopAppBar(
+    bridges: List<org.connectbot.service.TerminalBridge>,
+    currentBridgeIndex: Int,
+    onBridgeSelect: (Int) -> Unit,
+    onNavigateBack: () -> Unit,
+    useMenuIcon: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            // Horizontal scrollable selector for hosts
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                bridges.forEachIndexed { index, bridge ->
+                    // Card-style selector for each host
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (index == currentBridgeIndex) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant
+                                },
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .clickable { onBridgeSelect(index) }
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = bridge.host.nickname,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (index == currentBridgeIndex) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = if (useMenuIcon) Icons.Default.Menu else Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = if (useMenuIcon) stringResource(R.string.title_hosts) else null
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        modifier = modifier
+    )
 }
 
 /**

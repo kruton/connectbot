@@ -39,6 +39,7 @@ import org.connectbot.di.CoroutineDispatchers
 import org.connectbot.service.ServiceError
 import org.connectbot.service.TerminalBridge
 import org.connectbot.service.TerminalManager
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -218,11 +219,13 @@ class HostsViewModel @Inject constructor(
     }
 
     private fun updateBridges(allBridges: List<TerminalBridge>) {
+        Timber.d("updateBridges called with ${allBridges.size} bridges: ${allBridges.map { it.host.id }}")
         _uiState.update { currentState ->
             // Find the bridge for the currently selected host, if any
             val selectedBridge = currentState.selectedHostId?.let { hostId ->
                 allBridges.find { bridge -> bridge.host.id == hostId }
             }
+            Timber.d("updateBridges: selectedHostId=${currentState.selectedHostId}, selectedBridge=${selectedBridge?.host?.id}")
 
             // If we have a selected bridge, set the current index to it
             val newIndex = if (selectedBridge != null) {
@@ -330,13 +333,22 @@ class HostsViewModel @Inject constructor(
     }
 
     // Console/terminal actions
-    fun selectHost(hostId: Long) {
+    fun selectHost(hostId: Long?) {
+        Timber.d("selectHost called: hostId=$hostId")
+        if (hostId == null) {
+            Timber.d("Clearing host selection")
+            savedStateHandle.remove<Long>(KEY_SELECTED_HOST_ID)
+            _uiState.update { it.copy(selectedHostId = null) }
+            return
+        }
+
         savedStateHandle[KEY_SELECTED_HOST_ID] = hostId
         _uiState.update { it.copy(selectedHostId = hostId) }
 
         // Find the bridge for this host and switch to it
         val bridges = _uiState.value.bridges
         val bridgeIndex = bridges.indexOfFirst { it.host.id == hostId }
+        Timber.d("selectHost: found bridge at index $bridgeIndex for hostId=$hostId")
         if (bridgeIndex >= 0) {
             selectBridge(bridgeIndex)
         }
@@ -349,22 +361,27 @@ class HostsViewModel @Inject constructor(
     }
 
     fun connectToHost(host: Host) {
+        Timber.d("connectToHost called: hostId=${host.id}, nickname=${host.nickname}")
         viewModelScope.launch {
             try {
                 val bridge = withContext(dispatchers.io) {
                     // Check if already connected
                     val existingBridge = terminalManager?.bridgesFlow?.value?.find { it.host.id == host.id }
+                    Timber.d("connectToHost: existingBridge=${existingBridge?.host?.id}")
                     existingBridge ?: terminalManager?.openConnectionForHostId(host.id)
                 }
 
                 if (bridge != null) {
+                    Timber.d("connectToHost: bridge created/found, calling selectHost(${host.id})")
                     selectHost(host.id)
                 } else {
+                    Timber.w("connectToHost: bridge is null for hostId=${host.id}")
                     _uiState.update {
                         it.copy(error = "Failed to connect to ${host.nickname}")
                     }
                 }
             } catch (e: Exception) {
+                Timber.e(e, "connectToHost: exception for hostId=${host.id}")
                 _uiState.update {
                     it.copy(error = e.message ?: "Failed to connect")
                 }

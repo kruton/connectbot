@@ -248,7 +248,7 @@ private fun NavBackStackEntry?.lifecycleIsResumed() =
  * the back button. This checks if the current destination's lifecycle state is RESUMED
  * before allowing the navigation to proceed.
  */
-private fun NavHostController.safePopBackStack() =
+internal fun NavHostController.safePopBackStack() =
     if (currentBackStackEntry.lifecycleIsResumed()) popBackStack() else false
 
 /**
