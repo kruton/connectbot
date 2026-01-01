@@ -248,6 +248,7 @@ class HostsViewModel @Inject constructor(
         is ServiceError.KeyLoadFailed -> {
             context.getString(R.string.error_key_load_failed, error.keyName, error.reason)
         }
+
         is ServiceError.ConnectionFailed -> {
             context.getString(
                 R.string.error_connection_failed,
@@ -256,6 +257,7 @@ class HostsViewModel @Inject constructor(
                 error.reason
             )
         }
+
         is ServiceError.PortForwardLoadFailed -> {
             context.getString(
                 R.string.error_port_forward_load_failed,
@@ -263,9 +265,11 @@ class HostsViewModel @Inject constructor(
                 error.reason
             )
         }
+
         is ServiceError.HostSaveFailed -> {
             context.getString(R.string.error_host_save_failed, error.hostNickname, error.reason)
         }
+
         is ServiceError.ColorSchemeLoadFailed -> {
             context.getString(R.string.error_color_scheme_load_failed, error.reason)
         }

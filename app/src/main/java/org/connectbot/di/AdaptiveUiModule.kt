@@ -44,9 +44,7 @@ object AdaptiveUiModule {
     @Singleton
     fun provideAdaptiveUiDataStore(
         @ApplicationContext context: Context
-    ): DataStore<Preferences> {
-        return context.adaptiveUiDataStore
-    }
+    ): DataStore<Preferences> = context.adaptiveUiDataStore
 
     /**
      * Provides the AdaptiveUiPreferences instance.
@@ -55,7 +53,5 @@ object AdaptiveUiModule {
     @Singleton
     fun provideAdaptiveUiPreferences(
         dataStore: DataStore<Preferences>
-    ): AdaptiveUiPreferences {
-        return AdaptiveUiPreferences(dataStore)
-    }
+    ): AdaptiveUiPreferences = AdaptiveUiPreferences(dataStore)
 }

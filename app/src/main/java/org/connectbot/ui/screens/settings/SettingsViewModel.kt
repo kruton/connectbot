@@ -28,9 +28,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,8 +45,6 @@ import org.connectbot.util.PreferenceConstants
 import org.connectbot.util.TerminalFontProvider
 import timber.log.Timber
 import javax.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 
 data class SettingsUiState(
     val memkeys: Boolean = true,
@@ -78,7 +78,7 @@ data class SettingsUiState(
     val fontImportInProgress: Boolean = false,
     val fontImportError: String? = null,
     val defaultProfileId: Long = 0L,
-    val availableProfiles: List<Profile> = emptyList(),
+    val availableProfiles: List<Profile> = emptyList()
 )
 
 @HiltViewModel
@@ -175,7 +175,7 @@ class SettingsViewModel @Inject constructor(
             customFonts = customFonts,
             customTerminalTypes = customTerminalTypes,
             localFonts = localFonts,
-            defaultProfileId = prefs.getLong("defaultProfileId", 0L),
+            defaultProfileId = prefs.getLong("defaultProfileId", 0L)
         )
     }
 

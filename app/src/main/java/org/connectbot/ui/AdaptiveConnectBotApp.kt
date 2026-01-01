@@ -44,14 +44,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.connectbot.R
 import org.connectbot.data.entity.Host
-import org.connectbot.ui.navigation.navigateSafely
-import org.connectbot.ui.navigation.safePopBackStack
 import org.connectbot.ui.navigation.NavArgs
 import org.connectbot.ui.navigation.NavDestinations
+import org.connectbot.ui.navigation.navigateSafely
+import org.connectbot.ui.navigation.safePopBackStack
 import org.connectbot.ui.screens.hosteditor.HostEditorScreen
 import org.connectbot.ui.screens.hosts.HostsAdaptiveScreen
-import org.connectbot.ui.screens.pubkeylist.PubkeyListScreen
 import org.connectbot.ui.screens.profiles.ProfileListScreen
+import org.connectbot.ui.screens.pubkeylist.PubkeyListScreen
 import org.connectbot.ui.screens.settings.SettingsScreen
 import org.connectbot.ui.theme.ConnectBotTheme
 import timber.log.Timber
@@ -79,9 +79,9 @@ fun AdaptiveConnectBotApp(
     navController: NavHostController,
     makingShortcut: Boolean,
     onRetryMigration: () -> Unit,
-    onShortcutSelected: (Host) -> Unit,
+    onSelectShortcut: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     ConnectBotTheme {
         when (appUiState) {
@@ -119,7 +119,7 @@ fun AdaptiveConnectBotApp(
                             AdaptiveNavigationContent(
                                 navController = navController,
                                 makingShortcut = makingShortcut,
-                                onShortcutSelected = onShortcutSelected,
+                                onSelectShortcut = onSelectShortcut,
                                 onNavigateToConsole = onNavigateToConsole
                             )
                         }
@@ -148,9 +148,9 @@ fun AdaptiveConnectBotApp(
 private fun AdaptiveNavigationContent(
     navController: NavHostController,
     makingShortcut: Boolean,
-    onShortcutSelected: (Host) -> Unit,
+    onSelectShortcut: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     // Track selected destination - persists across configuration changes
     var selectedDestination by rememberSaveable { mutableStateOf(AdaptiveDestination.HOSTS) }
@@ -216,7 +216,7 @@ private fun AdaptiveNavigationContent(
                 selectedDestination = selectedDestination,
                 navController = navController,
                 makingShortcut = makingShortcut,
-                onShortcutSelected = onShortcutSelected,
+                onSelectShortcut = onSelectShortcut,
                 onNavigateToConsole = onNavigateToConsole,
                 onNavigationVisibilityChange = { visible -> showNavigation = visible }
             )
@@ -227,7 +227,7 @@ private fun AdaptiveNavigationContent(
             selectedDestination = selectedDestination,
             navController = navController,
             makingShortcut = makingShortcut,
-            onShortcutSelected = onShortcutSelected,
+            onSelectShortcut = onSelectShortcut,
             onNavigateToConsole = onNavigateToConsole,
             onNavigationVisibilityChange = { visible -> showNavigation = visible },
             modifier = modifier
@@ -243,7 +243,7 @@ private fun DestinationContent(
     selectedDestination: AdaptiveDestination,
     navController: NavHostController,
     makingShortcut: Boolean,
-    onShortcutSelected: (Host) -> Unit,
+    onSelectShortcut: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
     onNavigationVisibilityChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -252,15 +252,18 @@ private fun DestinationContent(
         AdaptiveDestination.HOSTS -> HostsDestination(
             navController = navController,
             makingShortcut = makingShortcut,
-            onShortcutSelected = onShortcutSelected,
+            onSelectShortcut = onSelectShortcut,
             onNavigateToConsole = onNavigateToConsole,
             onNavigationVisibilityChange = { visible ->
                 Timber.d("HostsDestination onNavigationVisibilityChange: visible=$visible")
                 onNavigationVisibilityChange(visible)
             }
         )
+
         AdaptiveDestination.PUBLIC_KEYS -> PublicKeysDestination(navController = navController)
+
         AdaptiveDestination.PROFILES -> ProfilesDestination(navController = navController)
+
         AdaptiveDestination.SETTINGS -> SettingsDestination()
     }
 }
@@ -272,13 +275,13 @@ private fun DestinationContent(
 private fun HostsDestination(
     navController: NavHostController,
     makingShortcut: Boolean,
-    onShortcutSelected: (Host) -> Unit,
+    onSelectShortcut: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
-    onNavigationVisibilityChange: (Boolean) -> Unit = {},
+    onNavigationVisibilityChange: (Boolean) -> Unit = {}
 ) {
     HostsAdaptiveScreen(
         makingShortcut = makingShortcut,
-        onShortcutSelected = onShortcutSelected,
+        onSelectShortcut = onSelectShortcut,
         onNavigateToConsole = onNavigateToConsole,
         onNavigateToHostEditor = { hostId ->
             if (hostId != null) {

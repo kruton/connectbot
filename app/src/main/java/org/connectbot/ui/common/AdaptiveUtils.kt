@@ -27,6 +27,4 @@ import androidx.window.core.layout.WindowSizeClass
  * which is used to adapt the UI for phones, tablets, and desktop devices.
  */
 @Composable
-fun rememberWindowSizeClass(): WindowSizeClass {
-    return currentWindowAdaptiveInfo().windowSizeClass
-}
+fun rememberWindowSizeClass(): WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass

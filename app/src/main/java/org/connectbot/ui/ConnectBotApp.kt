@@ -38,7 +38,7 @@ fun ConnectBotApp(
     navController: NavHostController,
     makingShortcut: Boolean,
     onRetryMigration: () -> Unit,
-    onShortcutSelected: (Host) -> Unit,
+    onSelectShortcut: (Host) -> Unit,
     onNavigateToConsole: (Host) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -73,7 +73,7 @@ fun ConnectBotApp(
                         navController = navController,
                         startDestination = NavDestinations.HOST_LIST,
                         makingShortcut = makingShortcut,
-                        onShortcutSelected = onShortcutSelected,
+                        onSelectShortcut = onSelectShortcut,
                         onNavigateToConsole = onNavigateToConsole,
                         modifier = modifier
                     )
