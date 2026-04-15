@@ -22,6 +22,8 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.google.ase.Exec
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.connectbot.R
 import org.connectbot.data.entity.Host
 import timber.log.Timber
@@ -41,6 +43,8 @@ class Local @VisibleForTesting constructor(private val killer: Killer) : AbsTran
     private var `is`: FileInputStream? = null
     private var os: FileOutputStream? = null
 
+    private val writeDispatcher = Dispatchers.IO.limitedParallelism(1)
+
     constructor() : this(AndroidKiller())
 
     override fun close() {
@@ -55,13 +59,16 @@ class Local @VisibleForTesting constructor(private val killer: Killer) : AbsTran
         }
     }
 
-    override fun connect() {
+    @Throws(IOException::class)
+    override suspend fun connect() = withContext(writeDispatcher) {
         val pids = IntArray(1)
 
         try {
             shellFd = Exec.createSubprocess("/system/bin/sh", "-", null, pids)
         } catch (e: Exception) {
-            bridge?.outputLine(manager?.res?.getString(R.string.local_shell_unavailable))
+            withContext(Dispatchers.Main) {
+                bridge?.outputLine(manager?.res?.getString(R.string.local_shell_unavailable))
+            }
             Timber.e(e, "Cannot start local shell")
             throw e
         }
@@ -80,12 +87,16 @@ class Local @VisibleForTesting constructor(private val killer: Killer) : AbsTran
         `is` = FileInputStream(shellFd)
         os = FileOutputStream(shellFd)
 
-        bridge?.onConnected()
+        withContext(Dispatchers.Main) {
+            bridge?.onConnected()
+        }
+        Unit
     }
 
     @Throws(IOException::class)
-    override fun flush() {
+    override suspend fun flush() = withContext(writeDispatcher) {
         os?.flush()
+        Unit
     }
 
     override fun getDefaultNickname(username: String?, hostname: String?, port: Int): String = DEFAULT_URI
@@ -97,17 +108,19 @@ class Local @VisibleForTesting constructor(private val killer: Killer) : AbsTran
     override fun isSessionOpen(): Boolean = `is` != null && os != null
 
     @Throws(IOException::class)
-    override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int = withContext(Dispatchers.IO) {
         val inputStream = `is` ?: run {
-            bridge?.dispatchDisconnect(false)
+            withContext(Dispatchers.Main) {
+                bridge?.dispatchDisconnect(false)
+            }
             throw IOException("session closed")
         }
-        return inputStream.read(buffer, offset, length)
+        inputStream.read(buffer, offset, length)
     }
 
-    override fun setDimensions(columns: Int, rows: Int, width: Int, height: Int) {
+    override suspend fun setDimensions(columns: Int, rows: Int, width: Int, height: Int) = withContext(writeDispatcher) {
         // We are not connected yet.
-        val fd = shellFd ?: return
+        val fd = shellFd ?: return@withContext
 
         try {
             Exec.setPtyWindowSize(fd, rows, columns, width, height)
@@ -117,13 +130,15 @@ class Local @VisibleForTesting constructor(private val killer: Killer) : AbsTran
     }
 
     @Throws(IOException::class)
-    override fun write(buffer: ByteArray) {
+    override suspend fun write(buffer: ByteArray) = withContext(writeDispatcher) {
         os?.write(buffer)
+        Unit
     }
 
     @Throws(IOException::class)
-    override fun write(c: Int) {
+    override suspend fun write(c: Int) = withContext(writeDispatcher) {
         os?.write(c)
+        Unit
     }
 
     override fun createHost(uri: Uri): Host {

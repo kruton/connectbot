@@ -42,6 +42,8 @@ import com.trilead.ssh2.signature.DSASHA1Verify
 import com.trilead.ssh2.signature.ECDSASHA2Verify
 import com.trilead.ssh2.signature.Ed25519Verify
 import com.trilead.ssh2.signature.RSASHA1Verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.connectbot.R
 import org.connectbot.data.entity.Host
 import org.connectbot.data.entity.KeyStorageType
@@ -99,6 +101,8 @@ class SSH :
     private var pubkeysExhausted = false
     private var interactiveCanContinue = true
     private var savedPasswordTried = false
+
+    private val writeDispatcher = Dispatchers.IO.limitedParallelism(1)
 
     private var connection: Connection? = null
     private val jumpConnections: MutableList<Connection> = mutableListOf()
@@ -245,7 +249,7 @@ class SSH :
                     }
                     if (result) {
                         // save this key in known database
-                        verifyHost.let {
+                        verifyHost?.let {
                             manager?.hostRepository?.saveKnownHostBlocking(it, hostname, port, serverHostKeyAlgorithm, serverHostKey)
                         }
                     }
@@ -282,7 +286,7 @@ class SSH :
                     )
                     if (result != null && result) {
                         // save this key in known database
-                        verifyHost.let {
+                        verifyHost?.let {
                             manager?.hostRepository?.saveKnownHostBlocking(it, hostname, port, serverHostKeyAlgorithm, serverHostKey)
                         }
                         true
@@ -824,8 +828,8 @@ class SSH :
         }
     }
 
-    override fun connect() {
-        val currentHost = host ?: return
+    override suspend fun connect() = withContext(writeDispatcher) {
+        val currentHost = host ?: return@withContext
 
         // Check if we need to connect through a jump host
         val jumpHostId = currentHost.jumpHostId
@@ -835,18 +839,22 @@ class SSH :
             if (jumpHost != null) {
                 directJumpConnection = connectToJumpHost(jumpHost)
                 if (directJumpConnection == null) {
-                    onDisconnect()
-                    return
+                    withContext(Dispatchers.Main) {
+                        onDisconnect()
+                    }
+                    return@withContext
                 }
             } else {
-                bridge?.outputLine(manager?.res?.getString(R.string.terminal_jump_not_found))
-                onDisconnect()
-                return
+                withContext(Dispatchers.Main) {
+                    bridge?.outputLine(manager?.res?.getString(R.string.terminal_jump_not_found))
+                    onDisconnect()
+                }
+                return@withContext
             }
         }
 
         connection = Connection(currentHost.hostname, currentHost.port)
-        connection?.addConnectionMonitor(this)
+        connection?.addConnectionMonitor(this@SSH)
 
         // If we have a jump host connection, set up the proxy
         directJumpConnection?.let {
@@ -866,36 +874,38 @@ class SSH :
             ) ?: throw IOException("Connection failed")
             connected = true
 
-            connectionInfo?.let { info ->
-                bridge?.outputLine(
-                    manager?.res?.getString(R.string.terminal_kex_algorithm, info.keyExchangeAlgorithm)
-                )
-                if (info.clientToServerCryptoAlgorithm == info.serverToClientCryptoAlgorithm &&
-                    info.clientToServerMACAlgorithm == info.serverToClientMACAlgorithm
-                ) {
+            withContext(Dispatchers.Main) {
+                connectionInfo?.let { info ->
                     bridge?.outputLine(
-                        manager?.res?.getString(
-                            R.string.terminal_using_algorithm,
-                            info.clientToServerCryptoAlgorithm,
-                            info.clientToServerMACAlgorithm ?: ""
-                        )
+                        manager?.res?.getString(R.string.terminal_kex_algorithm, info.keyExchangeAlgorithm)
                     )
-                } else {
-                    bridge?.outputLine(
-                        manager?.res?.getString(
-                            R.string.terminal_using_c2s_algorithm,
-                            info.clientToServerCryptoAlgorithm,
-                            info.clientToServerMACAlgorithm ?: ""
+                    if (info.clientToServerCryptoAlgorithm == info.serverToClientCryptoAlgorithm &&
+                        info.clientToServerMACAlgorithm == info.serverToClientMACAlgorithm
+                    ) {
+                        bridge?.outputLine(
+                            manager?.res?.getString(
+                                R.string.terminal_using_algorithm,
+                                info.clientToServerCryptoAlgorithm,
+                                info.clientToServerMACAlgorithm ?: ""
+                            )
                         )
-                    )
+                    } else {
+                        bridge?.outputLine(
+                            manager?.res?.getString(
+                                R.string.terminal_using_c2s_algorithm,
+                                info.clientToServerCryptoAlgorithm,
+                                info.clientToServerMACAlgorithm ?: ""
+                            )
+                        )
 
-                    bridge?.outputLine(
-                        manager?.res?.getString(
-                            R.string.terminal_using_s2c_algorithm,
-                            info.serverToClientCryptoAlgorithm,
-                            info.serverToClientMACAlgorithm ?: ""
+                        bridge?.outputLine(
+                            manager?.res?.getString(
+                                R.string.terminal_using_s2c_algorithm,
+                                info.serverToClientCryptoAlgorithm,
+                                info.serverToClientMACAlgorithm ?: ""
+                            )
                         )
-                    )
+                    }
                 }
             }
         } catch (e: IOException) {
@@ -915,8 +925,10 @@ class SSH :
             }
 
             close()
-            onDisconnect()
-            return
+            withContext(Dispatchers.Main) {
+                onDisconnect()
+            }
+            return@withContext
         }
 
         try {
@@ -963,15 +975,16 @@ class SSH :
     }
 
     @Throws(IOException::class)
-    override fun flush() {
+    override suspend fun flush() = withContext(writeDispatcher) {
         stdin?.flush()
+        Unit
     }
 
     @Throws(IOException::class)
-    override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int = withContext(Dispatchers.IO) {
         var bytesRead = 0
 
-        val currentSession = session ?: return 0
+        val currentSession = session ?: return@withContext 0
 
         val newConditions = currentSession.waitForCondition(conditions, 0)
 
@@ -988,21 +1001,25 @@ class SSH :
 
         if ((newConditions and ChannelCondition.EOF) != 0) {
             close()
-            onDisconnect()
+            withContext(Dispatchers.Main) {
+                onDisconnect()
+            }
             throw IOException("Remote end closed connection")
         }
 
-        return bytesRead
+        bytesRead
     }
 
     @Throws(IOException::class)
-    override fun write(buffer: ByteArray) {
+    override suspend fun write(buffer: ByteArray) = withContext(writeDispatcher) {
         stdin?.write(buffer)
+        Unit
     }
 
     @Throws(IOException::class)
-    override fun write(c: Int) {
+    override suspend fun write(c: Int) = withContext(writeDispatcher) {
         stdin?.write(c)
+        Unit
     }
 
     override fun getOptions(): Map<String, String> = mapOf("compression" to compression.toString())
@@ -1167,9 +1184,9 @@ class SSH :
         }
     }
 
-    override fun setDimensions(columns: Int, rows: Int, width: Int, height: Int) {
-        this.columns = columns
-        this.rows = rows
+    override suspend fun setDimensions(columns: Int, rows: Int, width: Int, height: Int) = withContext(writeDispatcher) {
+        this@SSH.columns = columns
+        this@SSH.rows = rows
 
         if (sessionOpen) {
             try {

@@ -103,14 +103,14 @@ class TerminalKeyListener(
                     ) {
                         ourMetaState = ourMetaState and OUR_TRANSIENT.inv()
                         _modifierState.value = getModifierState()
-                        transport.write('/'.code)
+                        bridge.submitWrite('/'.code)
                         return true
                     } else if (keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT &&
                         (ourMetaState and OUR_TAB) != 0
                     ) {
                         ourMetaState = ourMetaState and OUR_TRANSIENT.inv()
                         _modifierState.value = getModifierState()
-                        transport.write(0x09)
+                        bridge.submitWrite(0x09)
                         return true
                     }
                 } else if (leftModifiersAreSlashAndTab) {
@@ -119,14 +119,14 @@ class TerminalKeyListener(
                     ) {
                         ourMetaState = ourMetaState and OUR_TRANSIENT.inv()
                         _modifierState.value = getModifierState()
-                        transport.write('/'.code)
+                        bridge.submitWrite('/'.code)
                         return true
                     } else if (keyCode == KeyEvent.KEYCODE_SHIFT_LEFT &&
                         (ourMetaState and OUR_TAB) != 0
                     ) {
                         ourMetaState = ourMetaState and OUR_TRANSIENT.inv()
                         _modifierState.value = getModifierState()
-                        transport.write(0x09)
+                        bridge.submitWrite(0x09)
                         return true
                     }
                 }
@@ -155,7 +155,7 @@ class TerminalKeyListener(
                 event.action == KeyEvent.ACTION_MULTIPLE
             ) {
                 val input = encoding?.let { event.characters.toByteArray(charset(it)) }
-                input?.let { transport.write(it) }
+                input?.let { bridge.submitWrite(it) }
                 return true
             }
 
@@ -207,13 +207,15 @@ class TerminalKeyListener(
                 } else {
                     when (keyCode) {
                         KeyEvent.KEYCODE_ALT_LEFT,
-                        KeyEvent.KEYCODE_ALT_RIGHT -> {
+                        KeyEvent.KEYCODE_ALT_RIGHT
+                        -> {
                             metaPress(OUR_ALT_ON)
                             return true
                         }
 
                         KeyEvent.KEYCODE_SHIFT_LEFT,
-                        KeyEvent.KEYCODE_SHIFT_RIGHT -> {
+                        KeyEvent.KEYCODE_SHIFT_RIGHT
+                        -> {
                             metaPress(OUR_SHIFT_ON)
                             return true
                         }
@@ -346,10 +348,10 @@ class TerminalKeyListener(
                     sendEscape()
                 }
                 if (finalChar < 0x80) {
-                    transport.write(finalChar)
+                    bridge.submitWrite(finalChar)
                 } else {
                     encoding?.let {
-                        transport.write(
+                        bridge.submitWrite(
                             String(Character.toChars(finalChar))
                                 .toByteArray(charset(it))
                         )
@@ -365,7 +367,7 @@ class TerminalKeyListener(
                 }
 
                 KeyEvent.KEYCODE_TAB -> {
-                    transport.write(0x09)
+                    bridge.submitWrite(0x09)
                     return true
                 }
 
@@ -376,12 +378,12 @@ class TerminalKeyListener(
                     )
                     when (camera) {
                         PreferenceConstants.CAMERA_CTRLA_SPACE -> {
-                            transport.write(0x01)
-                            transport.write(' '.code)
+                            bridge.submitWrite(0x01)
+                            bridge.submitWrite(' '.code)
                         }
 
                         PreferenceConstants.CAMERA_CTRLA -> {
-                            transport.write(0x01)
+                            bridge.submitWrite(0x01)
                         }
 
                         PreferenceConstants.CAMERA_ESC -> {
@@ -390,7 +392,7 @@ class TerminalKeyListener(
 
                         PreferenceConstants.CAMERA_ESC_A -> {
                             bridge.terminalEmulator.dispatchKey(0, VTermKey.ESCAPE)
-                            transport.write('a'.code)
+                            bridge.submitWrite('a'.code)
                         }
 
                         "text_input" -> {
@@ -487,12 +489,7 @@ class TerminalKeyListener(
             }
         } catch (e: IOException) {
             Timber.e(e, "Problem while trying to handle an onKey() event")
-            try {
-                transport?.flush()
-            } catch (_: IOException) {
-                Timber.d("Our transport was closed, dispatching disconnect event")
-                bridge.dispatchDisconnect(false)
-            }
+            bridge.submitFlush()
         } catch (_: NullPointerException) {
             Timber.d("Input before connection established ignored.")
             return true

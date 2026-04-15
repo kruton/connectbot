@@ -22,6 +22,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import de.mud.telnet.TelnetProtocolHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.connectbot.R
 import org.connectbot.data.entity.Host
 import org.connectbot.service.TerminalBridge
@@ -58,6 +60,8 @@ class Telnet : AbsTransport {
     private var height: Int = 0
 
     private var connected = false
+
+    private val writeDispatcher = Dispatchers.IO.limitedParallelism(1)
 
     constructor() {
         handler = object : TelnetProtocolHandler() {
@@ -112,11 +116,11 @@ class Telnet : AbsTransport {
         }
     }
 
-    override fun connect() {
+    override suspend fun connect() = withContext(writeDispatcher) {
         try {
             socket = Socket()
 
-            val currentHost = host ?: return
+            val currentHost = host ?: return@withContext
             tryAllAddresses(socket!!, currentHost.hostname, currentHost.port, currentHost.ipVersion)
 
             connected = true
@@ -124,7 +128,9 @@ class Telnet : AbsTransport {
             `is` = socket?.getInputStream()
             os = socket?.getOutputStream()
 
-            bridge?.onConnected()
+            withContext(Dispatchers.Main) {
+                bridge?.onConnected()
+            }
         } catch (e: UnknownHostException) {
             Timber.d(e, "IO Exception connecting to host")
             throw e
@@ -147,8 +153,9 @@ class Telnet : AbsTransport {
     }
 
     @Throws(IOException::class)
-    override fun flush() {
+    override suspend fun flush() = withContext(writeDispatcher) {
         os?.flush()
+        Unit
     }
 
     override fun getDefaultPort(): Int = DEFAULT_PORT
@@ -158,14 +165,14 @@ class Telnet : AbsTransport {
     override fun isSessionOpen(): Boolean = connected
 
     @Throws(IOException::class)
-    override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int = withContext(Dispatchers.IO) {
         /* process all already read bytes */
         var n: Int
 
         do {
             n = handler.negotiate(buffer, offset)
             if (n > 0) {
-                return n
+                return@withContext n
             }
         } while (n == 0)
 
@@ -173,40 +180,50 @@ class Telnet : AbsTransport {
             do {
                 n = handler.negotiate(buffer, offset)
                 if (n > 0) {
-                    return n
+                    return@withContext n
                 }
             } while (n == 0)
             n = `is`!!.read(buffer, offset, length)
             if (n < 0) {
-                bridge?.dispatchDisconnect(false)
+                withContext(Dispatchers.Main) {
+                    bridge?.dispatchDisconnect(false)
+                }
                 throw IOException("Remote end closed connection.")
             }
 
             handler.inputfeed(buffer, offset, n)
             n = handler.negotiate(buffer, offset)
         }
-        return n
+        n
     }
 
     @Throws(IOException::class)
-    override fun write(buffer: ByteArray) {
+    override suspend fun write(buffer: ByteArray) = withContext(writeDispatcher) {
         try {
             os?.write(buffer)
         } catch (_: SocketException) {
-            bridge?.dispatchDisconnect(false)
+            withContext(Dispatchers.Main) {
+                bridge?.dispatchDisconnect(false)
+                Unit
+            }
         }
+        Unit
     }
 
     @Throws(IOException::class)
-    override fun write(c: Int) {
+    override suspend fun write(c: Int) = withContext(writeDispatcher) {
         try {
             os?.write(c)
         } catch (_: SocketException) {
-            bridge?.dispatchDisconnect(false)
+            withContext(Dispatchers.Main) {
+                bridge?.dispatchDisconnect(false)
+                Unit
+            }
         }
+        Unit
     }
 
-    override fun setDimensions(columns: Int, rows: Int, width: Int, height: Int) {
+    override suspend fun setDimensions(columns: Int, rows: Int, width: Int, height: Int) = withContext(writeDispatcher) {
         try {
             handler.setWindowSize(columns, rows)
         } catch (e: IOException) {

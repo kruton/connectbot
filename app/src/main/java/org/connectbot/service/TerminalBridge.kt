@@ -74,9 +74,31 @@ class TerminalBridge {
     private sealed class TransportOperation {
         data class WriteData(val data: ByteArray) : TransportOperation()
         data class SetDimensions(val columns: Int, val rows: Int, val width: Int, val height: Int) : TransportOperation()
+        object Flush : TransportOperation()
     }
 
     private val transportOperations = Channel<TransportOperation>(Channel.UNLIMITED)
+
+    /**
+     * Serially submit a byte array to be written to the transport.
+     */
+    fun submitWrite(data: ByteArray) {
+        transportOperations.trySend(TransportOperation.WriteData(data))
+    }
+
+    /**
+     * Serially submit a single byte/char to be written to the transport.
+     */
+    fun submitWrite(c: Int) {
+        transportOperations.trySend(TransportOperation.WriteData(byteArrayOf(c.toByte())))
+    }
+
+    /**
+     * Serially submit a flush operation to the transport.
+     */
+    fun submitFlush() {
+        transportOperations.trySend(TransportOperation.Flush)
+    }
 
     var color: IntArray = IntArray(0)
 
@@ -103,6 +125,7 @@ class TerminalBridge {
     val defaultPaint: Paint
 
     private var relay: Relay? = null
+    private var relayJob: Job? = null
 
     private val emulation: String?
     private val scrollback: Int
@@ -242,7 +265,7 @@ class TerminalBridge {
             defaultForeground = Color(defaultFgColor),
             defaultBackground = Color(defaultBgColor),
             onKeyboardInput = { data ->
-                transportOperations.trySend(TransportOperation.WriteData(data))
+                submitWrite(data)
             },
             onBell = {
                 scope.launch {
@@ -301,6 +324,15 @@ class TerminalBridge {
                                 operation.width,
                                 operation.height
                             )
+                        }
+
+                        is TransportOperation.Flush -> {
+                            try {
+                                transport?.flush()
+                            } catch (_: IOException) {
+                                Timber.d("Transport closed during flush, dispatching disconnect")
+                                dispatchDisconnect(false)
+                            }
                         }
                     }
                 } catch (e: IOException) {
@@ -551,8 +583,10 @@ class TerminalBridge {
         if (isSessionOpen) {
             // create thread to relay incoming connection data to buffer
             transport?.let { t ->
+                // Cancel existing relay if it exists
+                relayJob?.cancel()
                 relay = Relay(this, t, dispatchers, encoding)
-                scope.launch {
+                relayJob = scope.launch {
                     relay?.start()
                 }
             }
@@ -784,6 +818,7 @@ class TerminalBridge {
     fun cleanup() {
         // Cancel grace period if active
         networkGracePeriodJob?.cancel()
+        relayJob?.cancel()
         inGracePeriod = false
 
         profileObservationJob?.cancel()
