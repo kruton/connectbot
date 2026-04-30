@@ -60,9 +60,9 @@ import org.connectbot.ui.components.DisconnectAllDialog
 import org.connectbot.ui.navigation.NavDestinations
 import org.connectbot.ui.theme.ConnectBotTheme
 import org.connectbot.util.IconStyle
-import org.connectbot.util.NotificationPermissionHelper
 import org.connectbot.util.PreferenceConstants
 import org.connectbot.util.ShortcutIconGenerator
+import org.connectbot.util.isNotificationPermissionGranted
 import timber.log.Timber
 
 // TODO: Move back to ComponentActivity when https://issuetracker.google.com/issues/178855209 is fixed.
@@ -79,26 +79,28 @@ class MainActivity : AppCompatActivity() {
     private var bound = false
     private var requestedUri: Uri? by mutableStateOf(null)
     private var pendingHostConnection: Host? by mutableStateOf(null)
+    // Holds the host waiting for permission result; not compose state so it doesn't trigger navigation.
+    private var hostAwaitingPermission: Host? = null
     internal var makingShortcut by mutableStateOf(false)
     private var showDisconnectAllDialog by mutableStateOf(false)
 
     private val requestNotificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { _ ->
         // Check the actual permission status instead of relying on the launcher result.
         // If user went to settings and granted permission, the result will be false but
         // the actual permission may be granted.
-        val actuallyGranted = NotificationPermissionHelper.isNotificationPermissionGranted(this)
+        val actuallyGranted = isNotificationPermissionGranted(this)
 
         appViewModel.onNotificationPermissionResult(actuallyGranted)?.let { uri ->
             requestedUri = uri
         }
-        // Connections do not require notification permission, so a denied permission
-        // does not block any pending host connection. Navigation to, and clearing of,
-        // any pendingHostConnection are handled unconditionally by the LaunchedEffect
-        // in the composable UI that observes this state.
-        if (!actuallyGranted && pendingHostConnection != null) {
-            Timber.d("Permission denied; proceeding with any pending host connection")
+        // Prefs are now written; move the waiting host into pendingHostConnection so
+        // the LaunchedEffect that watches it triggers navigation after the warning state is set.
+        hostAwaitingPermission?.let { host ->
+            Timber.d("Permission result received; proceeding to console for ${host.nickname}")
+            pendingHostConnection = host
+            hostAwaitingPermission = null
         }
     }
 
@@ -122,8 +124,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
                 lightScrim = android.graphics.Color.TRANSPARENT,
-                darkScrim = android.graphics.Color.TRANSPARENT
-            )
+                darkScrim = android.graphics.Color.TRANSPARENT,
+            ),
         )
         super.onCreate(savedInstanceState)
 
@@ -211,9 +213,11 @@ class MainActivity : AppCompatActivity() {
 
             // Re-check permission status when activity resumes (e.g., user grants/revokes in Settings)
             ObservePermissionOnResume { isGranted ->
-                if (pendingHostConnection != null) {
-                    // Permission state changed and we have a pending connection
+                if (hostAwaitingPermission != null) {
+                    // Permission state changed while waiting for a connection
                     appViewModel.onNotificationPermissionResult(isGranted)
+                    pendingHostConnection = hostAwaitingPermission
+                    hostAwaitingPermission = null
                 }
             }
 
@@ -228,7 +232,7 @@ class MainActivity : AppCompatActivity() {
                             Timber.d("User confirmed disconnectAll")
                             showDisconnectAllDialog = false
                             appViewModel.setPendingDisconnectAll(true)
-                        }
+                        },
                     )
                 }
             }
@@ -255,10 +259,11 @@ class MainActivity : AppCompatActivity() {
                                 requestedUri = uri
                                 appViewModel.clearPendingConnectionUri()
                             }
-                            // Also handle pending host connection
-                            pendingHostConnection?.let { host ->
+                            // Handle host waiting for permission result
+                            hostAwaitingPermission?.let { host ->
+                                appViewModel.onNotificationPermissionResult(isGranted = false)
                                 navController.navigate("${NavDestinations.CONSOLE}/${host.id}")
-                                pendingHostConnection = null
+                                hostAwaitingPermission = null
                             }
                         },
                         onAllow = {
@@ -267,7 +272,7 @@ class MainActivity : AppCompatActivity() {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -280,13 +285,15 @@ class MainActivity : AppCompatActivity() {
                 val prefs = PreferenceManager.getDefaultSharedPreferences(context)
                 val persistConnections = prefs.getBoolean(PreferenceConstants.CONNECTION_PERSIST, true)
 
-                if (!persistConnections || NotificationPermissionHelper.isNotificationPermissionGranted(context)) {
+                if (!persistConnections || isNotificationPermissionGranted(context)) {
                     // Either persistence is disabled (no permission needed) or permission granted, navigate immediately
                     navController.navigate("${NavDestinations.CONSOLE}/${host.id}")
                 } else {
-                    // Persistence is enabled but no permission - need to request permission
+                    // Persistence is enabled but no permission - need to request permission.
+                    // Store in hostAwaitingPermission (not compose state) so we don't navigate
+                    // until after the permission result is written to prefs.
                     Timber.d("Requesting notification permission before connection")
-                    pendingHostConnection = host
+                    hostAwaitingPermission = host
                     val shouldShowRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         this@MainActivity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
                     } else {
@@ -308,7 +315,11 @@ class MainActivity : AppCompatActivity() {
                 onSelectShortcut = { host, color, iconStyle ->
                     createShortcutAndFinish(host, color, iconStyle)
                 },
-                onNavigateToConsole = onNavigateToConsole
+                onNavigateToConsole = onNavigateToConsole,
+                shouldShowNotificationWarning = {
+                    !appViewModel.hostListSnackbarShownThisLaunch && appViewModel.shouldShowNotificationWarning()
+                },
+                onNotificationSnackbarShown = { appViewModel.markHostListSnackbarShown() },
             )
         }
     }
@@ -401,7 +412,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 private fun NotificationPermissionRationaleDialog(
     onDismiss: () -> Unit,
-    onAllow: () -> Unit
+    onAllow: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -416,6 +427,6 @@ private fun NotificationPermissionRationaleDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.connect_anyway))
             }
-        }
+        },
     )
 }
