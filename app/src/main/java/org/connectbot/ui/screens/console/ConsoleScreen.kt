@@ -157,8 +157,8 @@ const val AUTO_HIDE_DELAY_MS = 3000L
 fun ConsoleScreen(
     onNavigateBack: () -> Unit,
     onNavigateToPortForwards: (Long) -> Unit,
-    onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
+    onNavigateToSettings: () -> Unit = {},
     viewModel: ConsoleViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -168,6 +168,8 @@ fun ConsoleScreen(
 
     // Capture latest callback for use in effects
     val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
+    val currentOnNavigateToPortForwards by rememberUpdatedState(onNavigateToPortForwards)
+    val currentOnNavigateToSettings by rememberUpdatedState(onNavigateToSettings)
 
     LaunchedEffect(terminalManager) {
         terminalManager?.let { viewModel.setTerminalManager(it) }
@@ -414,7 +416,7 @@ fun ConsoleScreen(
                 duration = SnackbarDuration.Long,
             )
             if (result == SnackbarResult.ActionPerformed) {
-                onNavigateToSettings()
+                currentOnNavigateToSettings()
             }
         }
     }
@@ -928,7 +930,7 @@ fun ConsoleScreen(
                                     onClick = {
                                         showMenu = false
                                         currentBridge.host.id.let {
-                                            onNavigateToPortForwards(
+                                            currentOnNavigateToPortForwards(
                                                 it,
                                             )
                                         }

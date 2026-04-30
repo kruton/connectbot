@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
     private var bound = false
     private var requestedUri: Uri? by mutableStateOf(null)
     private var pendingHostConnection: Host? by mutableStateOf(null)
+
     // Holds the host waiting for permission result; not compose state so it doesn't trigger navigation.
     private var hostAwaitingPermission: Host? = null
     internal var makingShortcut by mutableStateOf(false)
@@ -319,7 +320,7 @@ class MainActivity : AppCompatActivity() {
                 shouldShowNotificationWarning = {
                     !appViewModel.hostListSnackbarShownThisLaunch && appViewModel.shouldShowNotificationWarning()
                 },
-                onNotificationSnackbarShown = { appViewModel.markHostListSnackbarShown() },
+                onShowNotificationSnackbar = { appViewModel.markHostListSnackbarShown() },
             )
         }
     }

@@ -206,7 +206,6 @@ fun SettingsScreen(
 fun SettingsScreenContent(
     uiState: SettingsUiState,
     onNavigateBack: () -> Unit,
-    highlightItem: String? = null,
     onAuthOnLaunchChange: (Boolean) -> Unit,
     onMemkeysChange: (Boolean) -> Unit,
     onConnPersistChange: (Boolean) -> Unit,
@@ -243,6 +242,7 @@ fun SettingsScreenContent(
     onBellVibrateChange: (Boolean) -> Unit,
     onBellNotificationChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    highlightItem: String? = null,
 ) {
     Scaffold(
         topBar = {
@@ -741,21 +741,23 @@ private fun SwitchPreference(
     modifier: Modifier = Modifier,
     highlightColor: Color = Color.Transparent,
 ) {
-    ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) },
-        trailingContent = {
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
-            )
-        },
-        colors = ListItemDefaults.colors(
-            containerColor = highlightColor,
-        ),
-        modifier = modifier.clickable { onCheckedChange(!checked) },
-    )
-    HorizontalDivider()
+    Column {
+        ListItem(
+            headlineContent = { Text(title) },
+            supportingContent = { Text(summary) },
+            trailingContent = {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = onCheckedChange,
+                )
+            },
+            colors = ListItemDefaults.colors(
+                containerColor = highlightColor,
+            ),
+            modifier = modifier.clickable { onCheckedChange(!checked) },
+        )
+        HorizontalDivider()
+    }
 }
 
 @Composable
@@ -768,23 +770,25 @@ private fun TextPreference(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) },
-        modifier = modifier.clickable { showDialog = true },
-    )
-    HorizontalDivider()
-
-    if (showDialog) {
-        TextPreferenceDialog(
-            title = title,
-            value = value,
-            onDismiss = { showDialog = false },
-            onConfirm = { newValue ->
-                onValueChange(newValue)
-                showDialog = false
-            },
+    Column {
+        ListItem(
+            headlineContent = { Text(title) },
+            supportingContent = { Text(summary) },
+            modifier = modifier.clickable { showDialog = true },
         )
+        HorizontalDivider()
+
+        if (showDialog) {
+            TextPreferenceDialog(
+                title = title,
+                value = value,
+                onDismiss = { showDialog = false },
+                onConfirm = { newValue ->
+                    onValueChange(newValue)
+                    showDialog = false
+                },
+            )
+        }
     }
 }
 
@@ -832,24 +836,26 @@ private fun ListPreference(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) },
-        modifier = modifier.clickable { showDialog = true },
-    )
-    HorizontalDivider()
-
-    if (showDialog) {
-        ListPreferenceDialog(
-            title = title,
-            value = value,
-            entries = entries,
-            onDismiss = { showDialog = false },
-            onConfirm = { newValue ->
-                onValueChange(newValue)
-                showDialog = false
-            },
+    Column {
+        ListItem(
+            headlineContent = { Text(title) },
+            supportingContent = { Text(summary) },
+            modifier = modifier.clickable { showDialog = true },
         )
+        HorizontalDivider()
+
+        if (showDialog) {
+            ListPreferenceDialog(
+                title = title,
+                value = value,
+                entries = entries,
+                onDismiss = { showDialog = false },
+                onConfirm = { newValue ->
+                    onValueChange(newValue)
+                    showDialog = false
+                },
+            )
+        }
     }
 }
 
@@ -894,25 +900,27 @@ private fun ListPreferenceWithCustom(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) },
-        modifier = modifier.clickable { showDialog = true },
-    )
-    HorizontalDivider()
-
-    if (showDialog) {
-        ListPreferenceWithCustomDialog(
-            title = title,
-            value = value,
-            entries = entries,
-            customLabel = customLabel,
-            onDismiss = { showDialog = false },
-            onConfirm = { newValue ->
-                onValueChange(newValue)
-                showDialog = false
-            },
+    Column {
+        ListItem(
+            headlineContent = { Text(title) },
+            supportingContent = { Text(summary) },
+            modifier = modifier.clickable { showDialog = true },
         )
+        HorizontalDivider()
+
+        if (showDialog) {
+            ListPreferenceWithCustomDialog(
+                title = title,
+                value = value,
+                entries = entries,
+                customLabel = customLabel,
+                onDismiss = { showDialog = false },
+                onConfirm = { newValue ->
+                    onValueChange(newValue)
+                    showDialog = false
+                },
+            )
+        }
     }
 }
 
@@ -1008,28 +1016,30 @@ private fun SliderPreference(
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Slider(
-            value = value,
-            onValueChange = onValueChange,
-            valueRange = 0f..1f,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp),
-        )
-        Text(
-            text = "${(value * 100).toInt()}%",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+    Column {
+        Column(
+            modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Slider(
+                value = value,
+                onValueChange = onValueChange,
+                valueRange = 0f..1f,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+            )
+            Text(
+                text = "${(value * 100).toInt()}%",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        HorizontalDivider()
     }
-    HorizontalDivider()
 }
 
 @Composable
