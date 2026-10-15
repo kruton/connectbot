@@ -74,7 +74,7 @@ jobs:
 
       - name: Store Gradle profile
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gradle-profile-verify
           path: build/reports/profile/
@@ -93,7 +93,7 @@ jobs:
 
       - name: Store SonarQube inputs
         if: needs.check-inputs.outputs.has-sonar-token == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sonar-verify
           path: sonar-verify.tar
@@ -159,7 +159,7 @@ jobs:
 
       - name: Store Gradle profile
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gradle-profile-release-${{ matrix.flavor }}
           path: build/reports/profile/
@@ -196,7 +196,7 @@ jobs:
 
       - name: Store release outputs
         if: ${{ inputs.is_push }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-${{ matrix.flavor }}
           path: release-${{ matrix.flavor }}.tar
@@ -264,7 +264,7 @@ jobs:
 
       - name: Store instrumentation test results
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: android-test-results-${{ matrix.flavor }}
           path: |
@@ -277,7 +277,7 @@ jobs:
 
       - name: Store Gradle profile
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gradle-profile-instrumentation-${{ matrix.flavor }}
           path: build/reports/profile/
@@ -298,7 +298,7 @@ jobs:
 
       - name: Store SonarQube inputs
         if: needs.check-inputs.outputs.has-sonar-token == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sonar-instrumentation-${{ matrix.flavor }}
           path: sonar-instrumentation-${{ matrix.flavor }}.tar
@@ -371,7 +371,7 @@ jobs:
 
       - name: Store Gradle profile
         if: always() && needs.check-inputs.outputs.has-sonar-token == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gradle-profile-analysis
           path: build/reports/profile/
@@ -428,7 +428,7 @@ jobs:
           zstd -- ./*.mapping.txt
 
       - name: Store artifacts for signing
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: apk
           path: |
